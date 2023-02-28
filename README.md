@@ -1,4 +1,7 @@
 # silk
+
+![build](https://github.com/hubenchang0515/silk/actions/workflows/cmake.yml/badge.svg)
+
 C programing language base library - C 语言基础库
 
 ## Usage
