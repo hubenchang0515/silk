@@ -7,4 +7,5 @@ int main()
     test_log();
     test_memory();
     test_vector();
+    return 0;
 }
