@@ -37,6 +37,9 @@ jobs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
+      with:
+          gcov: true
+          gcov_include: ${{github.workspace}}/src
 
 
 
