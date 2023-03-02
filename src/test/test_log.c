@@ -18,6 +18,8 @@ void test_log()
 
     SILK_ASSERT(silk_log_redirect(NULL) == true);
 
+
+#if _POSIX_C_SOURCE >= 200112L || _BSD_SOURCE
     setenv("TEST_LOG", "0", 1);
     SILK_ASSERT(silk_log_printf("TEST", "hello world\n") == false);
     setenv("TEST_LOG", "1", 1);
@@ -32,4 +34,5 @@ void test_log()
     SILK_ASSERT(silk_error_printf("TEST", "hello world\n") == false);
     setenv("TEST_ERROR", "1", 1);
     SILK_ASSERT(silk_error_printf("TEST", "hello world\n") == true);
+#endif
 }
