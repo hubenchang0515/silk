@@ -6,25 +6,32 @@
 #include <string.h>
 #include <errno.h>
 
-
-
+static bool silk_inner_error_abort = true;
 static FILE* silk_inner_log_file_fp = NULL;
 
-void silk_log_redirect(const char* file)
+void silk_log_set_error_abort(bool abort)
+{
+    silk_inner_error_abort = abort;
+}
+
+bool silk_log_redirect(const char* file)
 {
     if (file == NULL)
     {
-        fclose(silk_inner_log_file_fp);
-        silk_inner_log_file_fp = NULL;
-        return;
+        if (silk_inner_log_file_fp != NULL)
+        {
+            fclose(silk_inner_log_file_fp);
+            silk_inner_log_file_fp = NULL;
+        }
+        return true;
     }
     else
     {
         FILE* fp = fopen(file, "ab");
         if (fp == NULL)
         {
-            SILK_ERROR("cannot redirect to %s: %s\n", file, strerror(errno));
-            return;
+            SILK_ERROR("cannot redirect to '%s': %s\n", file, strerror(errno));
+            return false;
         }
         else
         {
@@ -32,6 +39,7 @@ void silk_log_redirect(const char* file)
                 fclose(silk_inner_log_file_fp);
 
             silk_inner_log_file_fp = fp;
+            return true;
         }
     }
 }
@@ -46,6 +54,7 @@ static bool silk_inner_check_category(const char* category, const char* suffix)
     if (strlen(category) >= SILK_LOG_CATEGORY_MAX_LENGTH)
         return false;
 
+    strcpy(flag, category);
     strcat(flag, suffix);
 
     const char* env = getenv(flag);
@@ -55,36 +64,44 @@ static bool silk_inner_check_category(const char* category, const char* suffix)
     return strcmp(env, "1") == 0;
 }
 
-void silk_log_printf(const char* category, const char* fmt, ...)
+bool silk_log_printf(const char* category, const char* fmt, ...)
 {
     if (!silk_inner_check_category(category, "_LOG"))
-        return;
+        return false;
 
     va_list args;
     va_start(args, fmt);
     vfprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, fmt, args);
     va_end(args);
+    return true;
 }
 
-void silk_debug_printf(const char* category, const char* fmt, ...)
+bool silk_debug_printf(const char* category, const char* fmt, ...)
 {
     if (!silk_inner_check_category(category, "_DEBUG"))
-        return;
+        return false;
 
     va_list args;
     va_start(args, fmt);
     vfprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, fmt, args);
     va_end(args);
+    return true;
 }
 
-void silk_error_printf(const char* category, const char* fmt, ...)
+bool silk_error_printf(const char* category, const char* fmt, ...)
 {
     if (!silk_inner_check_category(category, "_ERROR"))
-        return;
+        return false;
 
     va_list args;
     va_start(args, fmt);
     vfprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, fmt, args);
     va_end(args);
-    abort();
+
+    if (silk_inner_error_abort)
+    {
+        fflush(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp);
+        abort();
+    }
+    return true;
 }

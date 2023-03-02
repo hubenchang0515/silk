@@ -1,78 +1,55 @@
-#include "common.h"
-#include <stdlib.h>
-#include <string.h>
+#ifndef SILK_COMMON_H
+#define SILK_COMMON_H
 
-static silk_alloc_t     silk_inner_alloc    = malloc;
-static silk_free_t      silk_inner_free     = free;
-static silk_realloc_t   silk_inner_realloc  = realloc;
-static silk_copy_t      silk_inner_copy     = memmove;
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+
+typedef void* (*silk_alloc_t)(size_t bytes);
+typedef void (*silk_free_t)(void* ptr);
+typedef void* (*silk_realloc_t)(void* ptr, size_t byets);
+typedef void* (*silk_copy_t)(void* dst, const void* src, size_t byets);
 
 /*******************************************************
  * @brief set the alloc function
  * @param alloc_func the new alloc function
  * @return the old alloc function
  *******************************************************/
-silk_alloc_t silk_set_alloc_func(silk_alloc_t alloc_func)
-{
-    silk_alloc_t old = silk_inner_alloc;
-    silk_inner_alloc = alloc_func == NULL ? malloc : alloc_func;
-    return old;
-}
+silk_alloc_t silk_set_alloc_func(silk_alloc_t alloc_func);
 
 /*******************************************************
  * @brief set the free function
- * @param alloc_func the new free function
+ * @param free_func the new free function
  * @return the old free function
  *******************************************************/
-silk_free_t silk_set_free_func(silk_free_t free_func)
-{
-    silk_free_t old = silk_inner_free;
-    silk_inner_free = free_func == NULL ? free : free_func;
-    return old;
-}
+silk_free_t silk_set_free_func(silk_free_t free_func);
 
 /*******************************************************
  * @brief set the realloc function
  * @param realloc_func the new realloc function
  * @return the old realloc function
  *******************************************************/
-silk_realloc_t silk_set_realloc_func(silk_realloc_t realloc_func)
-{
-    silk_realloc_t old = silk_inner_realloc;
-    silk_inner_realloc = realloc_func == NULL ? realloc : realloc_func;
-    return old;
-}
+silk_realloc_t silk_set_realloc_func(silk_realloc_t realloc_func);
 
 /*******************************************************
  * @brief set the memory copy function
  * @param realloc_func the new memory copy function
  * @return the old memory copy function
  *******************************************************/
-silk_copy_t silk_set_copy_func(silk_copy_t copy_func)
-{
-    silk_copy_t old = silk_inner_copy;
-    silk_inner_copy = copy_func;
-    return old;
-}
+silk_copy_t silk_set_copy_func(silk_copy_t copy_func);
 
 /*******************************************************
  * @brief alloc memory
  * @param bytes the bytes of memory
  * @return the pointer to the memory
  *******************************************************/
-void* silk_alloc(size_t bytes)
-{
-    return silk_inner_alloc(bytes);
-}
+void* silk_alloc(size_t bytes);
 
 /*******************************************************
  * @brief free memory
  * @param ptr the pointer to the memory
  *******************************************************/
-void  silk_free(void* ptr)
-{
-    silk_inner_free(ptr);
-}
+void  silk_free(void* ptr);
 
 /*******************************************************
  * @brief realloc memory
@@ -80,10 +57,7 @@ void  silk_free(void* ptr)
  * @param bytes the bytes of new memory
  * @return the pointer to the new memory
  *******************************************************/
-void* silk_realloc(void* ptr, size_t bytes)
-{
-    return silk_inner_realloc(ptr, bytes);
-}
+void* silk_realloc(void* ptr, size_t bytes);
 
 /*******************************************************
  * @brief copy memory
@@ -92,7 +66,6 @@ void* silk_realloc(void* ptr, size_t bytes)
  * @param byte the bytes
  * @return dst
  *******************************************************/
-void* silk_copy(void* dst, const void* src, size_t bytes)
-{
-    return silk_inner_copy(dst, src, bytes);
-}
+void* silk_copy(void* dst, const void* src, size_t bytes);
+
+#endif // SILK_COMMON_H

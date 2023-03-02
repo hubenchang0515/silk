@@ -1,7 +1,7 @@
 #ifndef SILK_VECTOR_H
 #define SILK_VECTOR_H
 
-#include "common.h"
+#include "memory.h"
 
 typedef struct SilkVector* silk_vector_t;
 

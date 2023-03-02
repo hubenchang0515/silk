@@ -32,6 +32,6 @@ if (UNIT_TEST)
                                 COMPILE_FLAGS       "-fprofile-arcs -ftest-coverage")
         
         add_custom_target(coverage
-                        COMMAND ./silk_unit_test && lcov -c -d . -o coverage.info --rc lcov_branch_coverage=1 && genhtml --branch-coverage -o . coverage.info 
+                        COMMAND ./${UNIT_TEST_NAME} && lcov -c -d . -o coverage.info --rc lcov_branch_coverage=1 && genhtml --branch-coverage -o . coverage.info 
                         )
 endif(UNIT_TEST)

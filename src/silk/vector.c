@@ -1,4 +1,5 @@
 #include "vector.h"
+#include "log.h"
 
 struct SilkVector
 {
