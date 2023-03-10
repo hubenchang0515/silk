@@ -11,7 +11,7 @@ add_library(${PROJECT_NAME} ${SILK_SRC})
 set_target_properties(${PROJECT_NAME} 
                         PROPERTIES 
                         C_STANDARD      99
-                        PUBLIC_HEADER   ${SILK_HEADER})
+                        PUBLIC_HEADER   "${SILK_HEADER}")
 
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

@@ -10,8 +10,8 @@ struct SilkVector
 };
 
 #define SILK_VEC_POS(V,I)       ((void*)((uint8_t*)((V)->data) + (I)*((V)->element_size)))
-#define SILK_VEC_BEFORE(V, I)   ((V)->element_size * I)
-#define SILK_VEC_AFTER(V, I)   ((V)->element_size * ((V)->length - I))
+#define SILK_VEC_BEFORE(V, I)   ((V)->element_size * (I))
+#define SILK_VEC_AFTER(V, I)    ((V)->element_size * ((V)->length - (I)))
 
 static bool silk_vector_expand(silk_vector_t vector)
 {
@@ -263,9 +263,9 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
 bool silk_vector_remove(silk_vector_t vector, size_t index)
 {
     SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index <= vector->length);
+    SILK_ASSERT(index < vector->length);
 
-    silk_copy(SILK_VEC_POS(vector, index), SILK_VEC_POS(vector, index+1), SILK_VEC_AFTER(vector, index));
+    silk_copy(SILK_VEC_POS(vector, index), SILK_VEC_POS(vector, index+1), SILK_VEC_AFTER(vector, index+1));
     vector->length -= 1;
     return true;
 }
