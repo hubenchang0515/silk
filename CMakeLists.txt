@@ -33,5 +33,11 @@ if (UNIT_TEST)
         
         add_custom_target(coverage
                         COMMAND ./${UNIT_TEST_NAME} && lcov -c -d . -o coverage.info --rc lcov_branch_coverage=1 && genhtml --branch-coverage -o . coverage.info 
+                        DEPENDS ${UNIT_TEST_NAME}
+                        )
+
+        add_custom_target(memcheck
+                        COMMAND valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all ./${UNIT_TEST_NAME}
+                        DEPENDS ${UNIT_TEST_NAME}
                         )
 endif(UNIT_TEST)
