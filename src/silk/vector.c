@@ -89,6 +89,7 @@ void silk_vector_clear(silk_vector_t vector)
     SILK_ASSERT(vector != NULL);
     if (vector->data != NULL)
         silk_free(vector->data);
+    vector->data = NULL;
     vector->capacity = 0;
     vector->length = 0;
 }
