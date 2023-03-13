@@ -1,6 +1,7 @@
 #ifndef SILK_VECTOR_H
 #define SILK_VECTOR_H
 
+#include "common.h"
 #include "memory.h"
 
 typedef struct SilkVector* silk_vector_t;
@@ -154,5 +155,34 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data);
  * @return whether it is successful
  *******************************************************/
 bool silk_vector_pop_back(silk_vector_t vector, void* data);
+
+/*******************************************************
+ * @brief default compare function with memcpy
+ * @param x a value to compare
+ * @param y a value to compare
+ * @param userdata the vector
+ * @return negative value while x < y
+ *         positive value while x > y
+ *         0 while x == y
+ *******************************************************/
+int silk_vector_default_compare(const void* x, const void* y, const void* userdata);
+
+/*******************************************************
+ * @brief find a element in vector
+ * @param vector the vector
+ * @param data the element value
+ * @param begin the begin index
+ * @param compare function to compare
+ * @return index of the element, or SILK_INVALID_INDEX
+ *******************************************************/
+size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_fn compare);
+
+/*******************************************************
+ * @brief sort a vector by quick sort algorithm 
+ *        with stack rather than recursion
+ * @param vector the vector
+ * @param compare function to compare
+ *******************************************************/
+void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare);
 
 #endif // SILK_VECTOR_H

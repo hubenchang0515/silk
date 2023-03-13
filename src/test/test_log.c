@@ -35,4 +35,6 @@ void test_log()
     setenv("TEST_ERROR", "1", 1);
     SILK_ASSERT(silk_error_printf("TEST", "hello world\n") == true);
 #endif
+
+    silk_log_set_error_abort(true);
 }

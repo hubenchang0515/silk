@@ -1,6 +1,8 @@
 #include "vector.h"
 #include "log.h"
 
+#include <string.h>
+
 struct SilkVector
 {
     void* data;
@@ -9,9 +11,14 @@ struct SilkVector
     size_t capacity;
 };
 
-#define SILK_VEC_POS(V,I)       ((void*)((uint8_t*)((V)->data) + (I)*((V)->element_size)))
-#define SILK_VEC_BEFORE(V, I)   ((V)->element_size * (I))
-#define SILK_VEC_AFTER(V, I)    ((V)->element_size * ((V)->length - (I)))
+// get the V[I] element data pointer
+#define SILK_VECTOR_ELEMENT(V, I)           ((void*)((uint8_t*)((V)->data) + (I)*((V)->element_size)))
+
+// get the byte size from begin to I
+#define SILK_VECTOR_SIZE_TO(V, I)       ((V)->element_size * (I))
+
+// get the byte size from I to end
+#define SILK_VECTOR_SIZE_FROM(V, I)        ((V)->element_size * ((V)->length - (I)))
 
 static bool silk_vector_expand(silk_vector_t vector)
 {
@@ -226,7 +233,7 @@ bool silk_vector_append(silk_vector_t vector, const void* data)
         return false;
 
     uint8_t* ptr = (uint8_t*)(vector->data);
-    silk_copy(SILK_VEC_POS(vector, vector->length), data, vector->element_size);
+    silk_copy(SILK_VECTOR_ELEMENT(vector, vector->length), data, vector->element_size);
     vector->length += 1;
     return true;
 }
@@ -248,8 +255,8 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
         return false;
 
     uint8_t* ptr = (uint8_t*)(vector->data);
-    silk_copy(SILK_VEC_POS(vector, index+1), SILK_VEC_POS(vector, index), SILK_VEC_AFTER(vector, index));
-    silk_copy(SILK_VEC_POS(vector, index), data, vector->element_size);
+    silk_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
+    silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     vector->length += 1;
     return true;
 }
@@ -265,7 +272,7 @@ bool silk_vector_remove(silk_vector_t vector, size_t index)
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(index < vector->length);
 
-    silk_copy(SILK_VEC_POS(vector, index), SILK_VEC_POS(vector, index+1), SILK_VEC_AFTER(vector, index+1));
+    silk_copy(SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_SIZE_FROM(vector, index+1));
     vector->length -= 1;
     return true;
 }
@@ -282,7 +289,7 @@ bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(index <= vector->length);
 
-    silk_copy(SILK_VEC_POS(vector, index), data, vector->element_size);
+    silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     return true;
 }
 
@@ -298,7 +305,7 @@ bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(index <= vector->length);
 
-    silk_copy(data, SILK_VEC_POS(vector, index), vector->element_size);
+    silk_copy(data, SILK_VECTOR_ELEMENT(vector, index), vector->element_size);
     return true;
 }
 
@@ -310,6 +317,8 @@ bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
  *******************************************************/
 bool silk_vector_push_front(silk_vector_t vector, const void* data)
 {
+    SILK_ASSERT(vector != NULL);
+
     return silk_vector_insert(vector, 0, data);
 }
 
@@ -321,6 +330,8 @@ bool silk_vector_push_front(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_push_back(silk_vector_t vector, const void* data)
 {
+    SILK_ASSERT(vector != NULL);
+
     return silk_vector_append(vector, data);
 }
 
@@ -332,6 +343,8 @@ bool silk_vector_push_back(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_pop_front(silk_vector_t vector, void* data)
 {
+    SILK_ASSERT(vector != NULL);
+
     if (data != NULL && !silk_vector_get(vector, 0, data))
         return false;
 
@@ -346,8 +359,138 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data)
  *******************************************************/
 bool silk_vector_pop_back(silk_vector_t vector, void* data)
 {
+    SILK_ASSERT(vector != NULL);
+
     if (data != NULL && !silk_vector_get(vector, vector->length-1, data))
         return false;
 
     return silk_vector_remove(vector, vector->length-1);
+}
+
+/*******************************************************
+ * @brief default compare function with memcpy
+ * @param x a value to compare
+ * @param y a value to compare
+ * @param vector the vector
+ * @return negative value while x < y
+ *         positive value while x > y
+ *         0 while x == y
+ *******************************************************/
+int silk_vector_default_compare(const void* x, const void* y, const void* userdata)
+{
+    SILK_ASSERT(x != NULL);
+    SILK_ASSERT(y != NULL);
+    SILK_ASSERT(userdata != NULL);
+
+    const silk_vector_t vector = (const silk_vector_t)(userdata);
+    return memcmp(x, y, vector->element_size);
+}
+
+/*******************************************************
+ * @brief find a element in vector
+ * @param vector the vector
+ * @param data the element value
+ * @param begin the begin index
+ * @param compare function to compare
+ * @return index of the element, or 
+ *******************************************************/
+size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_fn compare)
+{
+    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(data != NULL);
+    SILK_ASSERT(compare != NULL);
+    
+    for (size_t i = begin; i < vector->length; i++)
+    {
+        if (compare(SILK_VECTOR_ELEMENT(vector, i), data, vector) == 0)
+        {
+            return i;
+        }
+    }
+
+    return SILK_INVALID_INDEX;
+}
+
+/*******************************************************
+ * @brief sort a vector by quick sort algorithm 
+ *        with stack rather than recursion
+ * @param vector the vector
+ * @param compare function to compare
+ *******************************************************/
+void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare)
+{
+    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(compare != NULL);
+
+    if (vector->length <= 1)
+        return;
+
+    silk_vector_t stack = silk_vector_new(sizeof(size_t));
+    SILK_ASSERT(stack != NULL);
+    void* buffer = silk_alloc(vector->element_size);
+    SILK_ASSERT(buffer != NULL);
+
+    size_t begin = 0;
+    size_t end = vector->length - 1;
+    silk_vector_push_back(stack, &begin);
+    silk_vector_push_back(stack, &end);
+
+    while (stack->length > 0)
+    {
+        silk_vector_pop_back(stack, &end);
+        silk_vector_pop_back(stack, &begin);
+        size_t base = begin;
+        size_t left = begin;
+        size_t right = end;
+        while (left < right)
+        {
+            // find right smaller than base
+            for (; right > left; right--)
+            {
+                if (compare(SILK_VECTOR_ELEMENT(vector, right), SILK_VECTOR_ELEMENT(vector, base), vector) < 0)
+                {
+                    break;
+                }
+            }
+
+            // find left greater than base
+            for (; left < right; left++)
+            {
+                if (compare(SILK_VECTOR_ELEMENT(vector, left), SILK_VECTOR_ELEMENT(vector, base), vector) > 0)
+                {
+                    break;
+                }
+            }
+
+            if (left == right)
+                break;
+
+            // swap right and left
+            memcpy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
+            memcpy(SILK_VECTOR_ELEMENT(vector, left),  SILK_VECTOR_ELEMENT(vector, right), vector->element_size);
+            memcpy(SILK_VECTOR_ELEMENT(vector, right),  buffer, vector->element_size);
+        }
+
+        // swap base and meetion
+        memcpy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
+        memcpy(SILK_VECTOR_ELEMENT(vector, left), SILK_VECTOR_ELEMENT(vector, base), vector->element_size);
+        memcpy(SILK_VECTOR_ELEMENT(vector, base),  buffer, vector->element_size);
+
+        // push the range of next turn 
+        if (begin + 1 < left)
+        {
+            size_t index = left - 1;
+            silk_vector_push_back(stack, &begin);
+            silk_vector_push_back(stack, &index);
+        }
+        if (end - 1> left)
+        {
+            size_t index = left + 1;
+            silk_vector_push_back(stack, &index);
+            silk_vector_push_back(stack, &end);
+        }
+    }
+
+    silk_free(buffer);
+    silk_vector_delete(stack);
 }

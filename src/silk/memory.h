@@ -1,5 +1,5 @@
-#ifndef SILK_COMMON_H
-#define SILK_COMMON_H
+#ifndef SILK_MEMORY_H
+#define SILK_MEMORY_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,4 +68,4 @@ void* silk_realloc(void* ptr, size_t bytes);
  *******************************************************/
 void* silk_copy(void* dst, const void* src, size_t bytes);
 
-#endif // SILK_COMMON_H
+#endif // SILK_MEMORY_H
