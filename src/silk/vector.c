@@ -71,6 +71,7 @@ silk_vector_t silk_vector_new(size_t element_size)
     vector->element_size = element_size;
     vector->length = 0;
     vector->capacity = 0;
+    return vector;
 }
 
 /*******************************************************
@@ -232,7 +233,6 @@ bool silk_vector_append(silk_vector_t vector, const void* data)
     if (!silk_vector_enough(vector))
         return false;
 
-    uint8_t* ptr = (uint8_t*)(vector->data);
     silk_copy(SILK_VECTOR_ELEMENT(vector, vector->length), data, vector->element_size);
     vector->length += 1;
     return true;
@@ -254,7 +254,6 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
     if (!silk_vector_enough(vector))
         return false;
 
-    uint8_t* ptr = (uint8_t*)(vector->data);
     silk_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
     silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     vector->length += 1;

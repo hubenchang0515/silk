@@ -8,10 +8,16 @@ aux_source_directory("src/silk" SILK_SRC)
 file(GLOB SILK_HEADER "${CMAKE_SOURCE_DIR}/src/silk/*.h")
 
 add_library(${PROJECT_NAME} ${SILK_SRC})
+
 set_target_properties(${PROJECT_NAME} 
                         PROPERTIES 
                         C_STANDARD      99
                         PUBLIC_HEADER   "${SILK_HEADER}")
+                        
+target_compile_options(${PROJECT_NAME} PRIVATE
+                        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
+                      )
 
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
@@ -22,8 +28,11 @@ install(TARGETS ${PROJECT_NAME}
 
 if (UNIT_TEST)
         set(UNIT_TEST_NAME ${PROJECT_NAME}_unit_test)
+
         aux_source_directory("src/test" TEST_SRC)
+
         add_executable(${UNIT_TEST_NAME} ${TEST_SRC} ${SILK_SRC})
+
         set_target_properties(${UNIT_TEST_NAME} 
                                 PROPERTIES 
                                 C_STANDARD          99
