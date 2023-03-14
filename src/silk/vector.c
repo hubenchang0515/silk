@@ -112,16 +112,11 @@ silk_vector_t silk_vector_copy(silk_vector_t vector)
     SILK_ASSERT(vector != NULL);
 
     silk_vector_t new_vector = silk_alloc(sizeof(struct SilkVector));
-    if (new_vector == NULL)
-        return NULL;
+    SILK_ASSERT(new_vector != NULL);
 
     silk_copy(new_vector, vector, sizeof(struct SilkVector));
     new_vector->data = silk_alloc(vector->element_size * vector->capacity);
-    if (new_vector->data == NULL)
-    {
-        silk_free(new_vector);
-        return NULL;
-    }
+    SILK_ASSERT(new_vector->data != NULL);
 
     silk_copy(new_vector->data, vector->data, vector->element_size * vector->length);
     return new_vector;
@@ -286,7 +281,7 @@ bool silk_vector_remove(silk_vector_t vector, size_t index)
 bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
 {
     SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index <= vector->length);
+    SILK_ASSERT(index < vector->length);
 
     silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     return true;
@@ -302,7 +297,7 @@ bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
 bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
 {
     SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index <= vector->length);
+    SILK_ASSERT(index < vector->length);
 
     silk_copy(data, SILK_VECTOR_ELEMENT(vector, index), vector->element_size);
     return true;
@@ -344,6 +339,9 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data)
 {
     SILK_ASSERT(vector != NULL);
 
+    if (vector->length == 0)
+        return false;
+
     if (data != NULL && !silk_vector_get(vector, 0, data))
         return false;
 
@@ -359,6 +357,9 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data)
 bool silk_vector_pop_back(silk_vector_t vector, void* data)
 {
     SILK_ASSERT(vector != NULL);
+
+    if (vector->length == 0)
+        return false;
 
     if (data != NULL && !silk_vector_get(vector, vector->length-1, data))
         return false;

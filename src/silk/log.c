@@ -30,7 +30,7 @@ bool silk_log_redirect(const char* file)
         FILE* fp = fopen(file, "ab");
         if (fp == NULL)
         {
-            SILK_ERROR("cannot redirect to '%s': %s\n", file, strerror(errno));
+            SILK_LOG("cannot redirect to '%s': %s\n", file, strerror(errno));
             return false;
         }
         else
@@ -69,6 +69,9 @@ bool silk_log_printf(const char* category, const char* fmt, ...)
     if (!silk_inner_check_category(category, "_LOG"))
         return false;
 
+    if (category != NULL)
+        fprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, "[%s_LOG]: ", category);
+
     va_list args;
     va_start(args, fmt);
     vfprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, fmt, args);
@@ -81,6 +84,9 @@ bool silk_debug_printf(const char* category, const char* fmt, ...)
     if (!silk_inner_check_category(category, "_DEBUG"))
         return false;
 
+    if (category != NULL)
+        fprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, "[%s_DEBUG]: ", category);
+    
     va_list args;
     va_start(args, fmt);
     vfprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, fmt, args);
@@ -92,6 +98,9 @@ bool silk_error_printf(const char* category, const char* fmt, ...)
 {
     if (!silk_inner_check_category(category, "_ERROR"))
         return false;
+
+    if (category != NULL)
+        fprintf(silk_inner_log_file_fp == NULL ? stdout : silk_inner_log_file_fp, "[%s_ERROR]: ", category);
 
     va_list args;
     va_start(args, fmt);

@@ -61,7 +61,7 @@ void test_vector()
     for (int i = 0; i < N; i++)
     {
         int n;
-        silk_vector_pop_front(vector, (void*)(&n));
+        SILK_ASSERT(silk_vector_pop_front(vector, (void*)(&n)) == true);
         SILK_ASSERT(n == i/2);
     }
 
@@ -72,9 +72,24 @@ void test_vector()
 
     // copy
     silk_vector_t copied = silk_vector_copy(vector);
-    silk_vector_delete(vector);
     SILK_ASSERT(silk_vector_length(copied) == N);
     SILK_ASSERT(silk_vector_capacity(copied) == N);
+    SILK_DEBUG("here\n");
+    // clear
+    silk_vector_clear(vector);
+    for (int i = 0; i < N; i++)
+    {
+        SILK_ASSERT(silk_vector_pop_front(vector, NULL) == false);
+        SILK_ASSERT(silk_vector_pop_back(vector, NULL) == false);
+    }
+
+    silk_vector_sort(vector, silk_vector_default_compare);
+
+    // clear empty vector
+    silk_vector_clear(vector);
+
+    // delete empty vector
+    silk_vector_delete(vector);
 
     // pop back
     for (int i = 0; i < N; i++)
@@ -84,5 +99,6 @@ void test_vector()
         SILK_ASSERT(n == N - i/2 - 1);
     }
 
+    // delete
     silk_vector_delete(copied);
 }
