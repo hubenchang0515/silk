@@ -74,7 +74,7 @@ void test_vector()
     silk_vector_t copied = silk_vector_copy(vector);
     SILK_ASSERT(silk_vector_length(copied) == N);
     SILK_ASSERT(silk_vector_capacity(copied) == N);
-    SILK_DEBUG("here\n");
+
     // clear
     silk_vector_clear(vector);
     for (int i = 0; i < N; i++)

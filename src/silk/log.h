@@ -1,5 +1,5 @@
 #ifndef SILK_LOG_H
-#define SLIK_LOG_H
+#define SILK_LOG_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +19,6 @@ bool silk_error_printf(const char* category, const char* fmt, ...);
 #define SILK_DEBUG(FMT, ...)    silk_debug_printf(NULL, "[SILK DEBUG - %s:%d]: " FMT, __FILE__, __LINE__, ##__VA_ARGS__)
 #define SILK_ERROR(FMT, ...)    silk_error_printf(NULL, "[SILK ERROR - %s:%d]: " FMT, __FILE__, __LINE__, ##__VA_ARGS__)
 
-#define SILK_ASSERT(X) do { if (!(X)) SILK_ERROR("assert '%s' failed.\n", #X); } while(0)
+#define SILK_ASSERT(X) do { if (!(X)) { SILK_ERROR("assert '%s' failed.\n", #X); abort(); } } while(0)
 
 #endif // SLIK_LOG_H
