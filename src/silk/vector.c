@@ -368,7 +368,7 @@ bool silk_vector_pop_back(silk_vector_t vector, void* data)
 }
 
 /*******************************************************
- * @brief default compare function with memcpy
+ * @brief default compare function with memcmp
  * @param x a value to compare
  * @param y a value to compare
  * @param vector the vector
@@ -466,15 +466,15 @@ void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare)
                 break;
 
             // swap right and left
-            memcpy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
-            memcpy(SILK_VECTOR_ELEMENT(vector, left),  SILK_VECTOR_ELEMENT(vector, right), vector->element_size);
-            memcpy(SILK_VECTOR_ELEMENT(vector, right),  buffer, vector->element_size);
+            silk_copy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
+            silk_copy(SILK_VECTOR_ELEMENT(vector, left),  SILK_VECTOR_ELEMENT(vector, right), vector->element_size);
+            silk_copy(SILK_VECTOR_ELEMENT(vector, right),  buffer, vector->element_size);
         }
 
         // swap base and meetion
-        memcpy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
-        memcpy(SILK_VECTOR_ELEMENT(vector, left), SILK_VECTOR_ELEMENT(vector, base), vector->element_size);
-        memcpy(SILK_VECTOR_ELEMENT(vector, base),  buffer, vector->element_size);
+        silk_copy(buffer, SILK_VECTOR_ELEMENT(vector, left), vector->element_size);
+        silk_copy(SILK_VECTOR_ELEMENT(vector, left), SILK_VECTOR_ELEMENT(vector, base), vector->element_size);
+        silk_copy(SILK_VECTOR_ELEMENT(vector, base),  buffer, vector->element_size);
 
         // push the range of next turn 
         if (begin + 1 < left)
