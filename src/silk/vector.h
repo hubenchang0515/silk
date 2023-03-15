@@ -2,6 +2,7 @@
 #define SILK_VECTOR_H
 
 #include "common.h"
+#include "compare.h"
 #include "memory.h"
 
 typedef struct SilkVector* silk_vector_t;
@@ -158,6 +159,10 @@ bool silk_vector_pop_back(silk_vector_t vector, void* data);
 
 /*******************************************************
  * @brief default compare function with memcpy
+ * @note  this function compare byte by byte
+ *        so it can be used to determine if value is equal, 
+ *        but it cannot compare the values of those type
+ *        like little-endian int, float and double
  * @param x a value to compare
  * @param y a value to compare
  * @param userdata the vector
@@ -175,7 +180,7 @@ int silk_vector_default_compare(const void* x, const void* y, const void* userda
  * @param compare function to compare
  * @return index of the element, or SILK_INVALID_INDEX
  *******************************************************/
-size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_fn compare);
+size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_t compare);
 
 /*******************************************************
  * @brief sort a vector by quick sort algorithm 
@@ -183,6 +188,6 @@ size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, si
  * @param vector the vector
  * @param compare function to compare
  *******************************************************/
-void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare);
+void silk_vector_sort(silk_vector_t vector, silk_compare_t compare);
 
 #endif // SILK_VECTOR_H

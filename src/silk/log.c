@@ -57,7 +57,7 @@ static bool silk_inner_check_category(const char* category, const char* suffix)
         return false;
 
     strncpy(flag, category, SILK_LOG_CATEGORY_MAX_LENGTH);
-    flag[SILK_LOG_CATEGORY_MAX_LENGTH] = NULL;
+    flag[SILK_LOG_CATEGORY_MAX_LENGTH] = 0;
     strncat(flag, suffix, SILK_LOG_CATEGORY_MAX_SUFFIX_LEN);
 
     const char* env = getenv(flag);

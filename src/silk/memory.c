@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static silk_alloc_t     silk_inner_alloc    = malloc;
-static silk_free_t      silk_inner_free     = free;
-static silk_realloc_t   silk_inner_realloc  = realloc;
-static silk_copy_t      silk_inner_copy     = memmove;
+static silk_alloc_t     silk_inner_alloc            = malloc;
+static silk_free_t      silk_inner_free             = free;
+static silk_realloc_t   silk_inner_realloc          = realloc;
+static silk_copy_t      silk_inner_copy             = memcpy;
+static silk_copy_t      silk_inner_overlap_copy     = memmove;
 
 /*******************************************************
  * @brief set the alloc function
@@ -51,7 +52,19 @@ silk_realloc_t silk_set_realloc_func(silk_realloc_t realloc_func)
 silk_copy_t silk_set_copy_func(silk_copy_t copy_func)
 {
     silk_copy_t old = silk_inner_copy;
-    silk_inner_copy = copy_func == NULL ? memmove : copy_func;
+    silk_inner_copy = copy_func == NULL ? memcpy : copy_func;
+    return old;
+}
+
+/*******************************************************
+ * @brief set the memory overlap copy function
+ * @param realloc_func the new memory copy function
+ * @return the old memory copy function
+ *******************************************************/
+silk_copy_t silk_set_overlap_copy_func(silk_copy_t copy_func)
+{
+    silk_copy_t old = silk_inner_overlap_copy;
+    silk_inner_overlap_copy = copy_func == NULL ? memmove : copy_func;
     return old;
 }
 
@@ -86,13 +99,25 @@ void* silk_realloc(void* ptr, size_t bytes)
 }
 
 /*******************************************************
- * @brief copy memory
+ * @brief copy memory, dst and src must not overlap
  * @param dst the pointer to destination memory
  * @param src the pointer to source memory
  * @param byte the bytes
  * @return dst
  *******************************************************/
-void* silk_copy(void* dst, const void* src, size_t bytes)
+void* silk_copy(void* restrict dst, const void* restrict src, size_t bytes)
 {
     return silk_inner_copy(dst, src, bytes);
+}
+
+/*******************************************************
+ * @brief copy memory, dst and src could overlap
+ * @param dst the pointer to destination memory
+ * @param src the pointer to source memory
+ * @param byte the bytes
+ * @return dst
+ *******************************************************/
+void* silk_overlap_copy(void* dst, const void* src, size_t bytes)
+{
+    return silk_inner_overlap_copy(dst, src, bytes);
 }

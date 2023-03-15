@@ -249,7 +249,7 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
     if (!silk_vector_enough(vector))
         return false;
 
-    silk_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
+    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
     silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     vector->length += 1;
     return true;
@@ -266,7 +266,7 @@ bool silk_vector_remove(silk_vector_t vector, size_t index)
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(index < vector->length);
 
-    silk_copy(SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_SIZE_FROM(vector, index+1));
+    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_SIZE_FROM(vector, index+1));
     vector->length -= 1;
     return true;
 }
@@ -368,7 +368,11 @@ bool silk_vector_pop_back(silk_vector_t vector, void* data)
 }
 
 /*******************************************************
- * @brief default compare function with memcmp
+ * @brief default compare function implemented by memcmp
+ * @note  this function compare byte by byte
+ *        so it can be used to determine if value is equal, 
+ *        but it cannot compare the values of those type
+ *        like little-endian int, float and double
  * @param x a value to compare
  * @param y a value to compare
  * @param vector the vector
@@ -394,7 +398,7 @@ int silk_vector_default_compare(const void* x, const void* y, const void* userda
  * @param compare function to compare
  * @return index of the element, or 
  *******************************************************/
-size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_fn compare)
+size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_t compare)
 {
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(data != NULL);
@@ -417,7 +421,7 @@ size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, si
  * @param vector the vector
  * @param compare function to compare
  *******************************************************/
-void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare)
+void silk_vector_sort(silk_vector_t vector, silk_compare_t compare)
 {
     SILK_ASSERT(vector != NULL);
     SILK_ASSERT(compare != NULL);
@@ -432,8 +436,8 @@ void silk_vector_sort(silk_vector_t vector, silk_compare_fn compare)
 
     size_t begin = 0;
     size_t end = vector->length - 1;
-    silk_vector_push_back(stack, &begin);
-    silk_vector_push_back(stack, &end);
+    SILK_ASSERT(silk_vector_push_back(stack, &begin) == true);
+    SILK_ASSERT(silk_vector_push_back(stack, &end) == true);
 
     while (stack->length > 0)
     {
