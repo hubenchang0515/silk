@@ -6,6 +6,8 @@
 #include <string.h>
 #include <errno.h>
 
+#define SILK_LOG_CATEGORY_MAX_SUFFIX_LEN 8
+
 static bool silk_inner_error_abort = true;
 static FILE* silk_inner_log_file_fp = NULL;
 
@@ -46,7 +48,7 @@ bool silk_log_redirect(const char* file)
 
 static bool silk_inner_check_category(const char* category, const char* suffix)
 {
-    char flag[SILK_LOG_CATEGORY_MAX_LENGTH + 8];
+    char flag[SILK_LOG_CATEGORY_MAX_LENGTH + SILK_LOG_CATEGORY_MAX_SUFFIX_LEN];
     
     if (category == NULL)
         return true;
@@ -54,8 +56,9 @@ static bool silk_inner_check_category(const char* category, const char* suffix)
     if (strlen(category) >= SILK_LOG_CATEGORY_MAX_LENGTH)
         return false;
 
-    strcpy(flag, category);
-    strcat(flag, suffix);
+    strncpy(flag, category, SILK_LOG_CATEGORY_MAX_LENGTH);
+    flag[SILK_LOG_CATEGORY_MAX_LENGTH] = NULL;
+    strncat(flag, suffix, SILK_LOG_CATEGORY_MAX_SUFFIX_LEN);
 
     const char* env = getenv(flag);
     if (env == NULL)
