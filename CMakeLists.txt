@@ -38,11 +38,19 @@ if (UNIT_TEST)
                                 C_STANDARD          99
                                 INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/
                                 LINK_LIBRARIES      gcov
-                                COMPILE_FLAGS       "-fprofile-arcs -ftest-coverage")
+                                COMPILE_FLAGS       "-g -pg -fprofile-arcs -ftest-coverage")
+
+        add_custom_target(rm-coverage
+                        COMMAND $(RM) -rf ./coverage || (exit 0)
+                        )
+
+        add_custom_target(rm-gcda
+                        COMMAND $(RM) -rf `find . -name *.gcda` || (exit 0)
+                        )
         
         add_custom_target(coverage
-                        COMMAND ./${UNIT_TEST_NAME} && lcov -c -d . -o coverage.info --rc lcov_branch_coverage=1 && genhtml --branch-coverage -o . coverage.info 
-                        DEPENDS ${UNIT_TEST_NAME}
+                        COMMAND ./${UNIT_TEST_NAME} && lcov -c -d . -o coverage.info --rc lcov_branch_coverage=1 && genhtml --branch-coverage -o ./coverage coverage.info 
+                        DEPENDS ${UNIT_TEST_NAME} rm-coverage rm-gcda
                         )
 
         add_custom_target(memcheck

@@ -1,7 +1,7 @@
 #include <silk/log.h>
 #include <silk/vector.h>
 
-#define N 2048
+#define N 4096
 
 void test_vector()
 {
