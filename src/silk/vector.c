@@ -59,7 +59,7 @@ static bool silk_vector_enough(silk_vector_t vector)
 
 /*******************************************************
  * @brief create a vector
- * @param element_size the size of a element
+ * @param element_size the size of an element
  * @return the vector
  *******************************************************/
 silk_vector_t silk_vector_new(size_t element_size)
@@ -215,7 +215,7 @@ bool silk_vector_reserve(silk_vector_t vector, size_t capacity)
 }
 
 /*******************************************************
- * @brief append a element into a vector
+ * @brief append an element into a vector
  * @param vector the vector
  * @param data the element
  * @return whether it is successful
@@ -234,7 +234,7 @@ bool silk_vector_append(silk_vector_t vector, const void* data)
 }
 
 /*******************************************************
- * @brief insert a element into a vector
+ * @brief insert an element into a vector
  * @param vector the vector
  * @param index the index
  * @param data the element
@@ -256,7 +256,7 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
 }
 
 /*******************************************************
- * @brief remove a element from a vector
+ * @brief remove an element from a vector
  * @param vector the vector
  * @param index the index
  * @return whether it is successful
@@ -272,7 +272,7 @@ bool silk_vector_remove(silk_vector_t vector, size_t index)
 }
 
 /*******************************************************
- * @brief set a element value of a vector
+ * @brief set an element value of a vector
  * @param vector the vector
  * @param index the index
  * @param data the element value
@@ -288,7 +288,7 @@ bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
 }
 
 /*******************************************************
- * @brief get a element value of a vector
+ * @brief get an element value of a vector
  * @param vector the vector
  * @param index the index
  * @param data return the element value
@@ -304,7 +304,7 @@ bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
 }
 
 /*******************************************************
- * @brief push a element to the front of a vector
+ * @brief push an element to the front of a vector
  * @param vector the vector
  * @param data the element 
  * @return whether it is successful
@@ -317,7 +317,7 @@ bool silk_vector_push_front(silk_vector_t vector, const void* data)
 }
 
 /*******************************************************
- * @brief push a element to the back of a vector
+ * @brief push an element to the back of a vector
  * @param vector the vector
  * @param data the element 
  * @return whether it is successful
@@ -330,7 +330,7 @@ bool silk_vector_push_back(silk_vector_t vector, const void* data)
 }
 
 /*******************************************************
- * @brief pop a element from the front of a vector
+ * @brief pop an element from the front of a vector
  * @param vector the vector
  * @param data return the element, nullable
  * @return whether it is successful
@@ -349,7 +349,7 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data)
 }
 
 /*******************************************************
- * @brief pop a element from the back of a vector
+ * @brief pop an element from the back of a vector
  * @param vector the vector
  * @param data return the element, nullable
  * @return whether it is successful
@@ -391,7 +391,7 @@ int silk_vector_default_compare(const void* x, const void* y, const void* userda
 }
 
 /*******************************************************
- * @brief find a element in vector
+ * @brief find an element in vector
  * @param vector the vector
  * @param data the element value
  * @param begin the begin index
