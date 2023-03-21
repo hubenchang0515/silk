@@ -83,7 +83,16 @@ void test_vector()
     SILK_ASSERT(silk_vector_length(vector) == 0);
     SILK_ASSERT(silk_vector_capacity(vector) == 0);
 
-    silk_vector_sort(vector, silk_vector_default_compare);
+    // sort length <= 1
+    {
+        for (int i = 0; i < 2; i++)
+            silk_vector_append(vector, &i);
+        silk_vector_sort(vector, silk_compare_int); // sort length == 2
+        SILK_ASSERT(silk_vector_pop_back(vector, NULL) == true);
+        silk_vector_sort(vector, silk_compare_int); // sort length == 1
+        SILK_ASSERT(silk_vector_pop_front(vector, NULL) == true);
+        silk_vector_sort(vector, silk_compare_int); // sort length == 0
+    }
 
     // clear empty vector
     silk_vector_clear(vector);
