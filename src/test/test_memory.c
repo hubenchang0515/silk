@@ -7,11 +7,11 @@
 
 void test_memory()
 {
-    SILK_ASSERT(silk_set_alloc_func(NULL) == malloc);
-    SILK_ASSERT(silk_set_free_func(NULL) == free);
-    SILK_ASSERT(silk_set_realloc_func(NULL) == realloc);
-    SILK_ASSERT(silk_set_copy_func(NULL) == memcpy);
-    SILK_ASSERT(silk_set_overlap_copy_func(NULL) == memmove);
+    SILK_ASSERT(silk_set_alloc_func(malloc) == NULL);
+    SILK_ASSERT(silk_set_free_func(free) == NULL);
+    SILK_ASSERT(silk_set_realloc_func(realloc) == NULL);
+    SILK_ASSERT(silk_set_copy_func(memcpy) == NULL);
+    SILK_ASSERT(silk_set_overlap_copy_func(memmove) == NULL);
 
     void* p = silk_alloc(100);
     SILK_ASSERT(p != NULL);

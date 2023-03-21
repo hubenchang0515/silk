@@ -2,11 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-static silk_alloc_t     silk_inner_alloc            = malloc;
-static silk_free_t      silk_inner_free             = free;
-static silk_realloc_t   silk_inner_realloc          = realloc;
-static silk_copy_t      silk_inner_copy             = memcpy;
-static silk_copy_t      silk_inner_overlap_copy     = memmove;
+#define SILK_DEFAULT_ALLOC          malloc
+#define SILK_DEFAULT_FREE           free
+#define SILK_DEFAULT_REALLOC        realloc
+#define SILK_DEFAULT_COPY           memcpy
+#define SILK_DEFAULT_OVERLAP_COPY   memmove
+
+#define SILK_INVOKE_SWITCH(FN1, FN2) (FN1 ? FN1 : FN2)
+
+static silk_alloc_t     silk_inner_alloc            = NULL;
+static silk_free_t      silk_inner_free             = NULL;
+static silk_realloc_t   silk_inner_realloc          = NULL;
+static silk_copy_t      silk_inner_copy             = NULL;
+static silk_copy_t      silk_inner_overlap_copy     = NULL;
 
 /*******************************************************
  * @brief set the alloc function
@@ -16,7 +24,7 @@ static silk_copy_t      silk_inner_overlap_copy     = memmove;
 silk_alloc_t silk_set_alloc_func(silk_alloc_t alloc_func)
 {
     silk_alloc_t old = silk_inner_alloc;
-    silk_inner_alloc = alloc_func == NULL ? malloc : alloc_func;
+    silk_inner_alloc = alloc_func;
     return old;
 }
 
@@ -28,7 +36,7 @@ silk_alloc_t silk_set_alloc_func(silk_alloc_t alloc_func)
 silk_free_t silk_set_free_func(silk_free_t free_func)
 {
     silk_free_t old = silk_inner_free;
-    silk_inner_free = free_func == NULL ? free : free_func;
+    silk_inner_free = free_func;
     return old;
 }
 
@@ -40,7 +48,7 @@ silk_free_t silk_set_free_func(silk_free_t free_func)
 silk_realloc_t silk_set_realloc_func(silk_realloc_t realloc_func)
 {
     silk_realloc_t old = silk_inner_realloc;
-    silk_inner_realloc = realloc_func == NULL ? realloc : realloc_func;
+    silk_inner_realloc = realloc_func;
     return old;
 }
 
@@ -52,7 +60,7 @@ silk_realloc_t silk_set_realloc_func(silk_realloc_t realloc_func)
 silk_copy_t silk_set_copy_func(silk_copy_t copy_func)
 {
     silk_copy_t old = silk_inner_copy;
-    silk_inner_copy = copy_func == NULL ? memcpy : copy_func;
+    silk_inner_copy = copy_func;
     return old;
 }
 
@@ -64,7 +72,7 @@ silk_copy_t silk_set_copy_func(silk_copy_t copy_func)
 silk_copy_t silk_set_overlap_copy_func(silk_copy_t copy_func)
 {
     silk_copy_t old = silk_inner_overlap_copy;
-    silk_inner_overlap_copy = copy_func == NULL ? memmove : copy_func;
+    silk_inner_overlap_copy = copy_func;
     return old;
 }
 
@@ -75,16 +83,16 @@ silk_copy_t silk_set_overlap_copy_func(silk_copy_t copy_func)
  *******************************************************/
 void* silk_alloc(size_t bytes)
 {
-    return silk_inner_alloc(bytes);
+    return SILK_INVOKE_SWITCH(silk_inner_alloc, SILK_DEFAULT_ALLOC)(bytes);
 }
 
 /*******************************************************
  * @brief free memory
  * @param ptr the pointer to the memory
  *******************************************************/
-void  silk_free(void* ptr)
+void silk_free(void* ptr)
 {
-    silk_inner_free(ptr);
+    SILK_INVOKE_SWITCH(silk_inner_free, SILK_DEFAULT_FREE)(ptr);
 }
 
 /*******************************************************
@@ -95,7 +103,7 @@ void  silk_free(void* ptr)
  *******************************************************/
 void* silk_realloc(void* ptr, size_t bytes)
 {
-    return silk_inner_realloc(ptr, bytes);
+    return SILK_INVOKE_SWITCH(silk_inner_realloc, SILK_DEFAULT_REALLOC)(ptr, bytes);
 }
 
 /*******************************************************
@@ -107,7 +115,7 @@ void* silk_realloc(void* ptr, size_t bytes)
  *******************************************************/
 void* silk_copy(void* restrict dst, const void* restrict src, size_t bytes)
 {
-    return silk_inner_copy(dst, src, bytes);
+    return SILK_INVOKE_SWITCH(silk_inner_copy, SILK_DEFAULT_COPY)(dst, src, bytes);
 }
 
 /*******************************************************
@@ -119,5 +127,5 @@ void* silk_copy(void* restrict dst, const void* restrict src, size_t bytes)
  *******************************************************/
 void* silk_overlap_copy(void* dst, const void* src, size_t bytes)
 {
-    return silk_inner_overlap_copy(dst, src, bytes);
+    return SILK_INVOKE_SWITCH(silk_inner_overlap_copy, SILK_DEFAULT_OVERLAP_COPY)(dst, src, bytes);
 }

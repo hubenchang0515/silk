@@ -48,16 +48,16 @@ void test_compare()
     COMPARE_TEST(int64_t,   int64,  -TEST_RANGE, TEST_RANGE, 1);
     COMPARE_TEST(int64_t,   int64,  INT64_MAX-TEST_RANGE, INT64_MAX, 1);
 
-    COMPARE_TEST(intmax_t, intmax, INTMAX_MIN, INTMAX_MIN+TEST_RANGE, 1);
-    COMPARE_TEST(intmax_t, intmax, -TEST_RANGE, TEST_RANGE, 1);
-    COMPARE_TEST(intmax_t, intmax, INTMAX_MAX-TEST_RANGE, INTMAX_MAX, 1);
+    COMPARE_TEST(intmax_t,  intmax, INTMAX_MIN, INTMAX_MIN+TEST_RANGE, 1);
+    COMPARE_TEST(intmax_t,  intmax, -TEST_RANGE, TEST_RANGE, 1);
+    COMPARE_TEST(intmax_t,  intmax, INTMAX_MAX-TEST_RANGE, INTMAX_MAX, 1);
 
-    COMPARE_TEST(intptr_t, intptr, INTPTR_MIN, INTPTR_MIN+TEST_RANGE, 1);
-    COMPARE_TEST(intptr_t, intptr, -TEST_RANGE, TEST_RANGE, 1);
-    COMPARE_TEST(intptr_t, intptr, INTPTR_MAX-TEST_RANGE, INTPTR_MAX, 1);
+    COMPARE_TEST(intptr_t,  intptr, INTPTR_MIN, INTPTR_MIN+TEST_RANGE, 1);
+    COMPARE_TEST(intptr_t,  intptr, -TEST_RANGE, TEST_RANGE, 1);
+    COMPARE_TEST(intptr_t,  intptr, INTPTR_MAX-TEST_RANGE, INTPTR_MAX, 1);
 
-    COMPARE_TEST(uint,  uint,   0,                      0+TEST_RANGE, 1);
-    COMPARE_TEST(uint,  uint,   UINT_MAX-TEST_RANGE,    UINT_MAX, 1);
+    COMPARE_TEST(unsigned,  uint,   0,                      0+TEST_RANGE, 1);
+    COMPARE_TEST(unsigned,  uint,   UINT_MAX-TEST_RANGE,    UINT_MAX, 1);
 
     COMPARE_TEST(uint8_t,   uint8,  0,  UINT8_MAX,  1);
 
