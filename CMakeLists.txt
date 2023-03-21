@@ -4,20 +4,29 @@ project(silk VERSION 0.0.1 LANGUAGES C)
 
 option(UNIT_TEST "build unit test" OFF)
 
-aux_source_directory("src/silk" SILK_SRC)
-file(GLOB SILK_HEADER "${CMAKE_SOURCE_DIR}/src/silk/*.h")
 
+
+if (NOT SILK_ASSERT_MODE)
+        set(SILK_ASSERT_MODE 0)
+endif(NOT SILK_ASSERT_MODE)
+
+set(SILK_COMPILE_OPTIONS $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /DSILK_ASSERT_MODE=${SILK_ASSERT_MODE}>
+                         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -DSILK_ASSERT_MODE=${SILK_ASSERT_MODE}>)
+
+aux_source_directory("src/silk" SILK_SRC)
+
+file(GLOB SILK_HEADER "${CMAKE_SOURCE_DIR}/src/silk/*.h")
+                         
 add_library(${PROJECT_NAME} ${SILK_SRC})
 
 set_target_properties(${PROJECT_NAME} 
                         PROPERTIES 
                         C_STANDARD      99
-                        PUBLIC_HEADER   "${SILK_HEADER}")
-                        
-target_compile_options(${PROJECT_NAME} PRIVATE
-                        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra>
-                      )
+                        PUBLIC_HEADER   "${SILK_HEADER}"
+                        COMPILE_OPTIONS "${SILK_COMPILE_OPTIONS}"
+                        )
+
+
 
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
@@ -29,6 +38,9 @@ install(TARGETS ${PROJECT_NAME}
 if (UNIT_TEST)
         set(UNIT_TEST_NAME ${PROJECT_NAME}_unit_test)
 
+        set(UNIT_TEST_COMPILE_OPTIONS $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /DSILK_ASSERT_MODE=${SILK_ASSERT_MODE}>
+                                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -DSILK_ASSERT_MODE=${SILK_ASSERT_MODE} -g -pg -fprofile-arcs -ftest-coverage>)
+
         aux_source_directory("src/test" TEST_SRC)
 
         add_executable(${UNIT_TEST_NAME} ${TEST_SRC} ${SILK_SRC})
@@ -38,7 +50,7 @@ if (UNIT_TEST)
                                 C_STANDARD          99
                                 INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/
                                 LINK_LIBRARIES      gcov
-                                COMPILE_FLAGS       "-g -pg -fprofile-arcs -ftest-coverage")
+                                COMPILE_OPTIONS     "${UNIT_TEST_COMPILE_OPTIONS}")
 
         add_custom_target(rm-coverage
                         COMMAND $(RM) -rf ./coverage || (exit 0)

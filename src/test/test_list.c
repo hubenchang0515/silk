@@ -19,7 +19,7 @@ void test_list()
     {
         TYPE data = i * 2.0f;
         SILK_ASSERT(silk_list_push_front(list, &data) != NULL);
-        SILK_ASSERT(silk_list_length(list) == i + 1);
+        SILK_ASSERT(silk_list_length(list) == (size_t)(i + 1));
     }
     SILK_ASSERT(silk_list_next(silk_list_tail(list)) == NULL);
     SILK_ASSERT(silk_list_prev(silk_list_head(list)) == NULL);
@@ -48,7 +48,7 @@ void test_list()
     {
         TYPE data = i * 2.0f;
         SILK_ASSERT(silk_list_push_back(list, &data) != NULL);
-        SILK_ASSERT(silk_list_length(list) == i + 1);
+        SILK_ASSERT(silk_list_length(list) == (size_t)(i + 1));
     }
 
     // at
@@ -74,7 +74,7 @@ void test_list()
     {
         TYPE data = 0.0f;
         SILK_ASSERT(silk_list_push_front(list, &data) != NULL);
-        SILK_ASSERT(silk_list_length(list) == i + 1);
+        SILK_ASSERT(silk_list_length(list) == (size_t)(i + 1));
     }
 
     // next

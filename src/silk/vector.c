@@ -22,7 +22,7 @@ struct SilkVector
 
 static bool silk_vector_expand(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
 
     size_t capacity = vector->capacity;
     if (capacity == 0)
@@ -39,8 +39,7 @@ static bool silk_vector_expand(silk_vector_t vector)
     }
 
     void* data = silk_realloc(vector->data, vector->element_size * capacity);
-    if (data == NULL)
-        return false;
+    SILK_ASSERT(data != NULL, false);
 
     vector->data = data;
     vector->capacity = capacity;
@@ -49,7 +48,7 @@ static bool silk_vector_expand(silk_vector_t vector)
 
 static bool silk_vector_enough(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
 
     if (vector->capacity > vector->length)
         return true;
@@ -65,7 +64,7 @@ static bool silk_vector_enough(silk_vector_t vector)
 silk_vector_t silk_vector_new(size_t element_size)
 {
     silk_vector_t vector = silk_alloc(sizeof(struct SilkVector));
-    SILK_ASSERT(vector);
+    SILK_ASSERT(vector, NULL);
 
     vector->data = NULL;
     vector->element_size = element_size;
@@ -109,14 +108,14 @@ void silk_vector_clear(silk_vector_t vector)
  *******************************************************/
 silk_vector_t silk_vector_copy(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, NULL);
 
     silk_vector_t new_vector = silk_alloc(sizeof(struct SilkVector));
-    SILK_ASSERT(new_vector != NULL);
+    SILK_ASSERT(new_vector != NULL, NULL);
 
     silk_copy(new_vector, vector, sizeof(struct SilkVector));
     new_vector->data = silk_alloc(vector->element_size * vector->capacity);
-    SILK_ASSERT(new_vector->data != NULL);
+    SILK_ASSERT(new_vector->data != NULL, silk_free(new_vector), NULL);
 
     silk_copy(new_vector->data, vector->data, vector->element_size * vector->length);
     return new_vector;
@@ -129,7 +128,7 @@ silk_vector_t silk_vector_copy(silk_vector_t vector)
  *******************************************************/
 void* silk_vector_data(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, NULL);
     return vector->data;
 }
 
@@ -140,7 +139,7 @@ void* silk_vector_data(silk_vector_t vector)
  *******************************************************/
 const void* silk_vector_const_data(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, NULL);
     return (const void*)vector->data;
 }
 
@@ -151,7 +150,7 @@ const void* silk_vector_const_data(silk_vector_t vector)
  *******************************************************/
 size_t silk_vector_element_size(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, 0);
     return vector->element_size;
 }
 
@@ -162,7 +161,7 @@ size_t silk_vector_element_size(silk_vector_t vector)
  *******************************************************/
 size_t silk_vector_length(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, 0);
     return vector->length;
 }
 
@@ -173,7 +172,7 @@ size_t silk_vector_length(silk_vector_t vector)
  *******************************************************/
 size_t silk_vector_capacity(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, 0);
     return vector->capacity;
 }
 
@@ -184,10 +183,9 @@ size_t silk_vector_capacity(silk_vector_t vector)
  *******************************************************/
 bool silk_vector_recycle(silk_vector_t vector)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
     void* data = silk_realloc(vector->data, vector->element_size * vector->length);
-    if (data == NULL)
-        return false;
+    SILK_ASSERT(data != NULL, false);
 
     vector->data = data;
     vector->capacity = vector->length;
@@ -201,13 +199,12 @@ bool silk_vector_recycle(silk_vector_t vector)
  *******************************************************/
 bool silk_vector_reserve(silk_vector_t vector, size_t capacity)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
     if (vector->capacity >= capacity)
         return true;
 
     void* data = silk_realloc(vector->data, vector->element_size * capacity);
-    if (data == NULL)
-        return false;
+    SILK_ASSERT(data != NULL, false);
 
     vector->data = data;
     vector->capacity = capacity;
@@ -222,11 +219,9 @@ bool silk_vector_reserve(silk_vector_t vector, size_t capacity)
  *******************************************************/
 bool silk_vector_append(silk_vector_t vector, const void* data)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(data != NULL);
-
-    if (!silk_vector_enough(vector))
-        return false;
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(data != NULL, false);
+    SILK_ASSERT(silk_vector_enough(vector), false);
 
     silk_copy(SILK_VECTOR_ELEMENT(vector, vector->length), data, vector->element_size);
     vector->length += 1;
@@ -242,12 +237,10 @@ bool silk_vector_append(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(index <= vector->length);
-
-    if (!silk_vector_enough(vector))
-        return false;
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(data != NULL, false);
+    SILK_ASSERT(index <= vector->length, false);
+    SILK_ASSERT(silk_vector_enough(vector), false);
 
     silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
     silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
@@ -263,8 +256,8 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
  *******************************************************/
 bool silk_vector_remove(silk_vector_t vector, size_t index)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index < vector->length);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(index < vector->length, false);
 
     silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_SIZE_FROM(vector, index+1));
     vector->length -= 1;
@@ -280,8 +273,8 @@ bool silk_vector_remove(silk_vector_t vector, size_t index)
  *******************************************************/
 bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index < vector->length);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(index < vector->length, false);
 
     silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
     return true;
@@ -296,8 +289,8 @@ bool silk_vector_set(silk_vector_t vector, size_t index, const void* data)
  *******************************************************/
 bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(index < vector->length);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(index < vector->length, false);
 
     silk_copy(data, SILK_VECTOR_ELEMENT(vector, index), vector->element_size);
     return true;
@@ -311,7 +304,7 @@ bool silk_vector_get(silk_vector_t vector, size_t index, void* data)
  *******************************************************/
 bool silk_vector_push_front(silk_vector_t vector, const void* data)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
 
     return silk_vector_insert(vector, 0, data);
 }
@@ -324,7 +317,7 @@ bool silk_vector_push_front(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_push_back(silk_vector_t vector, const void* data)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
 
     return silk_vector_append(vector, data);
 }
@@ -337,13 +330,11 @@ bool silk_vector_push_back(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_pop_front(silk_vector_t vector, void* data)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(vector->length > 0, false);
 
-    if (vector->length == 0)
-        return false;
-
-    if (data != NULL && !silk_vector_get(vector, 0, data))
-        return false;
+    if (data != NULL)
+        SILK_ASSERT(silk_vector_get(vector, 0, data), false);
 
     return silk_vector_remove(vector, 0);
 }
@@ -356,13 +347,11 @@ bool silk_vector_pop_front(silk_vector_t vector, void* data)
  *******************************************************/
 bool silk_vector_pop_back(silk_vector_t vector, void* data)
 {
-    SILK_ASSERT(vector != NULL);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(vector->length > 0, false);
 
-    if (vector->length == 0)
-        return false;
-
-    if (data != NULL && !silk_vector_get(vector, vector->length-1, data))
-        return false;
+    if (data != NULL)
+        SILK_ASSERT(silk_vector_get(vector, vector->length-1, data), false);
 
     return silk_vector_remove(vector, vector->length-1);
 }
@@ -382,9 +371,9 @@ bool silk_vector_pop_back(silk_vector_t vector, void* data)
  *******************************************************/
 int silk_vector_default_compare(const void* x, const void* y, const void* userdata)
 {
-    SILK_ASSERT(x != NULL);
-    SILK_ASSERT(y != NULL);
-    SILK_ASSERT(userdata != NULL);
+    SILK_ASSERT(x != NULL, 0);
+    SILK_ASSERT(y != NULL, 0);
+    SILK_ASSERT(userdata != NULL, 0);
 
     const silk_vector_t vector = (const silk_vector_t)(userdata);
     return memcmp(x, y, vector->element_size);
@@ -400,9 +389,9 @@ int silk_vector_default_compare(const void* x, const void* y, const void* userda
  *******************************************************/
 size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, silk_compare_t compare)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(compare != NULL);
+    SILK_ASSERT(vector != NULL, SILK_INVALID_INDEX);
+    SILK_ASSERT(data != NULL, SILK_INVALID_INDEX);
+    SILK_ASSERT(compare != NULL, SILK_INVALID_INDEX);
     
     for (size_t i = begin; i < vector->length; i++)
     {

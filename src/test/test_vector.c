@@ -19,7 +19,7 @@ void test_vector()
     {
         SILK_ASSERT(silk_vector_find(vector, (void*)(&i), 0, silk_vector_default_compare) == SILK_INVALID_INDEX);
         SILK_ASSERT(silk_vector_push_back(vector, (void*)(&i)) == true);
-        SILK_ASSERT(silk_vector_length(vector) == (i+1));
+        SILK_ASSERT(silk_vector_length(vector) == (size_t)(i+1));
     }
     for (int i = 0; i < N; i++)
     {
@@ -51,8 +51,8 @@ void test_vector()
     // find
     for (int i = 0; i < N; i++)
     {
-        SILK_ASSERT(silk_vector_find(vector, (void*)(&i), 0, silk_vector_default_compare) == N - i - 1);
-        SILK_ASSERT(silk_vector_find(vector, (void*)(&i), N, silk_vector_default_compare) == 2*N - i - 1);
+        SILK_ASSERT(silk_vector_find(vector, (void*)(&i), 0, silk_vector_default_compare) == (size_t)(N - i - 1));
+        SILK_ASSERT(silk_vector_find(vector, (void*)(&i), N, silk_vector_default_compare) == (size_t)(2*N - i - 1));
     }
     
     // sort 
@@ -78,11 +78,10 @@ void test_vector()
 
     // clear
     silk_vector_clear(vector);
-    for (int i = 0; i < N; i++)
-    {
-        SILK_ASSERT(silk_vector_pop_front(vector, NULL) == false);
-        SILK_ASSERT(silk_vector_pop_back(vector, NULL) == false);
-    }
+    SILK_ASSERT(silk_vector_data(vector) == NULL);
+    SILK_ASSERT(silk_vector_const_data(vector) == NULL);
+    SILK_ASSERT(silk_vector_length(vector) == 0);
+    SILK_ASSERT(silk_vector_capacity(vector) == 0);
 
     silk_vector_sort(vector, silk_vector_default_compare);
 

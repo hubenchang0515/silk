@@ -28,10 +28,10 @@ struct SilkListNode
 static silk_list_node_t silk_list_make_first_node(silk_list_t list, const void* data)
 {
     silk_list_node_t new_node = silk_alloc(sizeof(struct SilkListNode));
-    SILK_ASSERT(new_node != NULL);
+    SILK_ASSERT(new_node != NULL, NULL);
 
     new_node->data = silk_alloc(list->element_size);
-    SILK_ASSERT(new_node->data);
+    SILK_ASSERT(new_node->data != NULL, silk_free(new_node), NULL);
     new_node->list = list;
     new_node->next = NULL;
     new_node->prev = NULL;
@@ -50,7 +50,7 @@ static silk_list_node_t silk_list_make_first_node(silk_list_t list, const void* 
 silk_list_t silk_list_new(size_t element_size)
 {
     silk_list_t list = silk_alloc(sizeof(struct SilkList));
-    SILK_ASSERT(list != NULL);
+    SILK_ASSERT(list != NULL, NULL);
 
     list->element_size = element_size;
     list->head = NULL;
@@ -100,9 +100,11 @@ void silk_list_clear(silk_list_t list)
  *******************************************************/
 silk_list_t silk_list_copy(silk_list_t list)
 {
-    SILK_ASSERT(list != NULL);
+    SILK_ASSERT(list != NULL, NULL);
 
     silk_list_t new_list = silk_list_new(list->element_size);
+    SILK_ASSERT(new_list != NULL, NULL);
+
     for (silk_list_node_t node = list->head; node != NULL; node = node->next)
     {
         silk_list_push_back(new_list, node->data);
@@ -118,7 +120,7 @@ silk_list_t silk_list_copy(silk_list_t list)
  *******************************************************/
 size_t silk_list_element_size(silk_list_t list)
 {
-    SILK_ASSERT(list != NULL);
+    SILK_ASSERT(list != NULL, 0);
 
     return list->element_size;
 }
@@ -130,7 +132,7 @@ size_t silk_list_element_size(silk_list_t list)
  *******************************************************/
 size_t silk_list_length(silk_list_t list)
 {
-    SILK_ASSERT(list != NULL);
+    SILK_ASSERT(list != NULL, 0);
 
     return list->length;
 }
@@ -142,6 +144,8 @@ size_t silk_list_length(silk_list_t list)
  *******************************************************/
 silk_list_node_t silk_list_head(silk_list_t list)
 {
+    SILK_ASSERT(list != NULL, 0);
+
     return list->head;
 }
 
@@ -152,6 +156,8 @@ silk_list_node_t silk_list_head(silk_list_t list)
  *******************************************************/
 silk_list_node_t silk_list_tail(silk_list_t list)
 {
+    SILK_ASSERT(list != NULL, 0);
+
     return list->tail;
 }
 
@@ -162,6 +168,8 @@ silk_list_node_t silk_list_tail(silk_list_t list)
  *******************************************************/
 silk_list_node_t silk_list_prev(silk_list_node_t node)
 {
+    SILK_ASSERT(node != NULL, 0);
+
     return node->prev;
 }
 
@@ -172,6 +180,8 @@ silk_list_node_t silk_list_prev(silk_list_node_t node)
  *******************************************************/
 silk_list_node_t silk_list_next(silk_list_node_t node)
 {
+    SILK_ASSERT(node != NULL, 0);
+
     return node->next;
 }
 
@@ -183,15 +193,15 @@ silk_list_node_t silk_list_next(silk_list_node_t node)
  *******************************************************/
 silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data)
 {
-    SILK_ASSERT(node != NULL);
-    SILK_ASSERT(node->list != NULL);
-    SILK_ASSERT(data != NULL);
+    SILK_ASSERT(node != NULL, NULL);
+    SILK_ASSERT(node->list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
 
     silk_list_node_t new_node = silk_alloc(sizeof(struct SilkListNode));
-    SILK_ASSERT(new_node != NULL);
+    SILK_ASSERT(new_node != NULL, NULL);
 
     new_node->data = silk_alloc(node->list->element_size);
-    SILK_ASSERT(new_node->data);
+    SILK_ASSERT(new_node->data, silk_free(new_node), NULL);
     new_node->list = node->list;
     new_node->next = node;
     new_node->prev = node->prev;
@@ -214,15 +224,15 @@ silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data
  *******************************************************/
 silk_list_node_t silk_list_insert_after(silk_list_node_t node, const void* data)
 {
-    SILK_ASSERT(node != NULL);
-    SILK_ASSERT(node->list != NULL);
-    SILK_ASSERT(data != NULL);
+    SILK_ASSERT(node != NULL, NULL);
+    SILK_ASSERT(node->list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
 
     silk_list_node_t new_node = silk_alloc(sizeof(struct SilkListNode));
-    SILK_ASSERT(new_node != NULL);
+    SILK_ASSERT(new_node != NULL, NULL);
 
     new_node->data = silk_alloc(node->list->element_size);
-    SILK_ASSERT(new_node->data);
+    SILK_ASSERT(new_node->data, silk_free(new_node), NULL);
     new_node->list = node->list;
     new_node->next = node->next;
     new_node->prev = node;
@@ -244,8 +254,8 @@ silk_list_node_t silk_list_insert_after(silk_list_node_t node, const void* data)
  *******************************************************/
 bool silk_list_remove(silk_list_node_t node)
 {
-    SILK_ASSERT(node != NULL);
-    SILK_ASSERT(node->list != NULL);
+    SILK_ASSERT(node != NULL, false);
+    SILK_ASSERT(node->list != NULL, false);
 
     if (node->prev != NULL)
         node->prev->next = node->next;
@@ -271,9 +281,9 @@ bool silk_list_remove(silk_list_node_t node)
  *******************************************************/
 bool silk_list_set(silk_list_node_t node, const void* data)
 {
-    SILK_ASSERT(node != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(node->list != NULL);
+    SILK_ASSERT(node != NULL, false);
+    SILK_ASSERT(data != NULL, false);
+    SILK_ASSERT(node->list != NULL, false);
 
     silk_copy(node->data, data, node->list->element_size);
     return true;
@@ -287,9 +297,9 @@ bool silk_list_set(silk_list_node_t node, const void* data)
  *******************************************************/
 bool silk_list_get(silk_list_node_t node, void* data)
 {
-    SILK_ASSERT(node != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(node->list != NULL);
+    SILK_ASSERT(node != NULL, false);
+    SILK_ASSERT(data != NULL, false);
+    SILK_ASSERT(node->list != NULL, false);
 
     silk_copy(data, node->data, node->list->element_size);
     return true;
@@ -306,7 +316,7 @@ silk_list_node_t silk_list_at(silk_list_t list, size_t index)
     silk_list_node_t node = list->head;
     for (size_t i = 0; i < index; i++)
     {
-        SILK_ASSERT(node != NULL);
+        SILK_ASSERT(node != NULL, NULL);
         node = node->next;
     }
 
@@ -324,7 +334,7 @@ silk_list_node_t silk_list_at_backward(silk_list_t list, size_t index)
     silk_list_node_t node = list->tail;
     for (size_t i = 0; i < index; i++)
     {
-        SILK_ASSERT(node != NULL);
+        SILK_ASSERT(node != NULL, NULL);
         node = node->prev;
     }
 
@@ -339,8 +349,8 @@ silk_list_node_t silk_list_at_backward(silk_list_t list, size_t index)
  *******************************************************/
 silk_list_node_t silk_list_push_front(silk_list_t list, const void* data)
 {
-    SILK_ASSERT(list != NULL);
-    SILK_ASSERT(data != NULL);
+    SILK_ASSERT(list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
 
     if (list->head != NULL)
         return silk_list_insert_before(list->head, data);
@@ -356,8 +366,8 @@ silk_list_node_t silk_list_push_front(silk_list_t list, const void* data)
  *******************************************************/
 silk_list_node_t silk_list_push_back(silk_list_t list, const void* data)
 {
-    SILK_ASSERT(list != NULL);
-    SILK_ASSERT(data != NULL);
+    SILK_ASSERT(list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
 
     if (list->tail != NULL)
         return silk_list_insert_after(list->tail, data);
@@ -373,9 +383,9 @@ silk_list_node_t silk_list_push_back(silk_list_t list, const void* data)
  *******************************************************/
 silk_list_node_t silk_list_pop_front(silk_list_t list, void* data)
 {
-    SILK_ASSERT(list != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(list->head != NULL);
+    SILK_ASSERT(list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
+    SILK_ASSERT(list->head != NULL, NULL);
 
     silk_list_get(list->head, data);
     silk_list_remove(list->head);
@@ -390,9 +400,9 @@ silk_list_node_t silk_list_pop_front(silk_list_t list, void* data)
  *******************************************************/
 silk_list_node_t silk_list_pop_back(silk_list_t list, void* data)
 {
-    SILK_ASSERT(list != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(list->tail != NULL);
+    SILK_ASSERT(list != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
+    SILK_ASSERT(list->tail != NULL, NULL);
 
     silk_list_get(list->tail, data);
     silk_list_remove(list->tail);
@@ -414,9 +424,9 @@ silk_list_node_t silk_list_pop_back(silk_list_t list, void* data)
  *******************************************************/
 int silk_list_default_compare(const void* x, const void* y, const void* userdata)
 {
-    SILK_ASSERT(x != NULL);
-    SILK_ASSERT(y != NULL);
-    SILK_ASSERT(userdata != NULL);
+    SILK_ASSERT(x != NULL, 0);
+    SILK_ASSERT(y != NULL, 0);
+    SILK_ASSERT(userdata != NULL, 0);
 
     const silk_list_t list = (const silk_list_t)(userdata);
     return memcmp(x, y, list->element_size);
@@ -431,9 +441,9 @@ int silk_list_default_compare(const void* x, const void* y, const void* userdata
  *******************************************************/
 silk_list_node_t silk_list_find(silk_list_node_t begin, const void* data, silk_compare_t compare)
 {
-    SILK_ASSERT(begin != NULL);
-    SILK_ASSERT(data != NULL);
-    SILK_ASSERT(compare != NULL);
+    SILK_ASSERT(begin != NULL, NULL);
+    SILK_ASSERT(data != NULL, NULL);
+    SILK_ASSERT(compare != NULL, NULL);
 
     for (silk_list_node_t node = begin; node != NULL; node = node->next)
     {
@@ -461,12 +471,12 @@ void silk_list_sort(silk_list_t list, silk_compare_t compare)
     silk_list_t stack = silk_list_new(sizeof(silk_list_node_t));
     SILK_ASSERT(stack != NULL);
     void* buffer = silk_alloc(list->element_size);
-    SILK_ASSERT(buffer != NULL);
+    SILK_ASSERT(buffer != NULL, silk_list_delete(stack));
 
     silk_list_node_t begin = list->head;
     silk_list_node_t end = list->tail;
-    SILK_ASSERT(silk_list_push_back(stack, &begin) != NULL);
-    SILK_ASSERT(silk_list_push_back(stack, &end) != NULL);
+    SILK_ASSERT(silk_list_push_back(stack, &begin) != NULL, silk_free(buffer), silk_list_delete(stack));
+    SILK_ASSERT(silk_list_push_back(stack, &end) != NULL, silk_free(buffer), silk_list_delete(stack));
 
     while (stack->length > 0)
     {
