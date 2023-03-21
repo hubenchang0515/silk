@@ -187,7 +187,8 @@ size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, si
  *        with stack rather than recursion
  * @param vector the vector
  * @param compare function to compare
+ * @return whether it is successful
  *******************************************************/
-void silk_vector_sort(silk_vector_t vector, silk_compare_t compare);
+bool silk_vector_sort(silk_vector_t vector, silk_compare_t compare);
 
 #endif // SILK_VECTOR_H

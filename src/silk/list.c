@@ -189,7 +189,7 @@ silk_list_node_t silk_list_next(silk_list_node_t node)
  * @brief insert an element before a node
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data)
 {
@@ -220,7 +220,7 @@ silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data
  * @brief insert an element after a node
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_insert_after(silk_list_node_t node, const void* data)
 {
@@ -379,7 +379,8 @@ silk_list_node_t silk_list_push_back(silk_list_t list, const void* data)
  * @brief pop an element from the front of a list
  * @param node the node
  * @param data the element data
- * @return the new head node
+ * @return the new head node, NULL means empty
+ * @note pop the only one node or failed both return NULL
  *******************************************************/
 silk_list_node_t silk_list_pop_front(silk_list_t list, void* data)
 {
@@ -396,7 +397,8 @@ silk_list_node_t silk_list_pop_front(silk_list_t list, void* data)
  * @brief pop an element from the back of a list
  * @param node the node
  * @param data the element data
- * @return the new tail node
+ * @return the new tail node, NULL means empty
+ * @note pop the only one node or failed both return NULL
  *******************************************************/
 silk_list_node_t silk_list_pop_back(silk_list_t list, void* data)
 {
@@ -459,24 +461,25 @@ silk_list_node_t silk_list_find(silk_list_node_t begin, const void* data, silk_c
  *        with stack rather than recursion
  * @param list the list
  * @param compare function to compare
+ * @return whether it is successful
  *******************************************************/
-void silk_list_sort(silk_list_t list, silk_compare_t compare)
+bool silk_list_sort(silk_list_t list, silk_compare_t compare)
 {
-    SILK_ASSERT(list != NULL);
-    SILK_ASSERT(compare != NULL);
+    SILK_ASSERT(list != NULL, false);
+    SILK_ASSERT(compare != NULL, false);
 
     if (list->length <= 1)
-        return;
+        return true;
 
     silk_list_t stack = silk_list_new(sizeof(silk_list_node_t));
-    SILK_ASSERT(stack != NULL);
+    SILK_ASSERT(stack != NULL, false);
     void* buffer = silk_alloc(list->element_size);
-    SILK_ASSERT(buffer != NULL, silk_list_delete(stack));
+    SILK_ASSERT(buffer != NULL, silk_list_delete(stack), false);
 
     silk_list_node_t begin = list->head;
     silk_list_node_t end = list->tail;
-    SILK_ASSERT(silk_list_push_back(stack, &begin) != NULL, silk_free(buffer), silk_list_delete(stack));
-    SILK_ASSERT(silk_list_push_back(stack, &end) != NULL, silk_free(buffer), silk_list_delete(stack));
+    SILK_ASSERT(silk_list_push_back(stack, &begin), silk_free(buffer), silk_list_delete(stack), false);
+    SILK_ASSERT(silk_list_push_back(stack, &end), silk_free(buffer), silk_list_delete(stack), false);
 
     while (stack->length > 0)
     {
@@ -524,17 +527,18 @@ void silk_list_sort(silk_list_t list, silk_compare_t compare)
         if (left != begin)
         {
             silk_list_node_t border = silk_list_prev(left);
-            silk_list_push_back(stack, &begin);
-            silk_list_push_back(stack, &border);
+            SILK_ASSERT(silk_list_push_back(stack, &begin), silk_free(buffer), silk_list_delete(stack), false);
+            SILK_ASSERT(silk_list_push_back(stack, &border), silk_free(buffer), silk_list_delete(stack), false);
         }
         if (left != end)
         {
             silk_list_node_t border = silk_list_next(left);
-            silk_list_push_back(stack, &border);
-            silk_list_push_back(stack, &end);
+            SILK_ASSERT(silk_list_push_back(stack, &border), silk_free(buffer), silk_list_delete(stack), false);
+            SILK_ASSERT(silk_list_push_back(stack, &end), silk_free(buffer), silk_list_delete(stack), false);
         }
     }
 
     silk_free(buffer);
     silk_list_delete(stack);
+    return true;
 }

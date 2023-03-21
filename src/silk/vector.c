@@ -409,24 +409,25 @@ size_t silk_vector_find(silk_vector_t vector, const void* data, size_t begin, si
  *        with stack rather than recursion
  * @param vector the vector
  * @param compare function to compare
+ * @return whether it is successful
  *******************************************************/
-void silk_vector_sort(silk_vector_t vector, silk_compare_t compare)
+bool silk_vector_sort(silk_vector_t vector, silk_compare_t compare)
 {
-    SILK_ASSERT(vector != NULL);
-    SILK_ASSERT(compare != NULL);
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(compare != NULL, false);
 
     if (vector->length <= 1)
-        return;
+        return true;
 
     silk_vector_t stack = silk_vector_new(sizeof(size_t));
-    SILK_ASSERT(stack != NULL);
+    SILK_ASSERT(stack != NULL, false);
     void* buffer = silk_alloc(vector->element_size);
-    SILK_ASSERT(buffer != NULL);
+    SILK_ASSERT(buffer != NULL, silk_vector_delete(stack), false);
 
     size_t begin = 0;
     size_t end = vector->length - 1;
-    SILK_ASSERT(silk_vector_push_back(stack, &begin) == true);
-    SILK_ASSERT(silk_vector_push_back(stack, &end) == true);
+    SILK_ASSERT(silk_vector_push_back(stack, &begin), silk_free(buffer), silk_vector_delete(stack), false);
+    SILK_ASSERT(silk_vector_push_back(stack, &end), silk_free(buffer), silk_vector_delete(stack), false);
 
     while (stack->length > 0)
     {
@@ -473,17 +474,18 @@ void silk_vector_sort(silk_vector_t vector, silk_compare_t compare)
         if (begin + 1 < left)
         {
             size_t index = left - 1;
-            silk_vector_push_back(stack, &begin);
-            silk_vector_push_back(stack, &index);
+            SILK_ASSERT(silk_vector_push_back(stack, &begin), silk_free(buffer), silk_vector_delete(stack), false);
+            SILK_ASSERT(silk_vector_push_back(stack, &index), silk_free(buffer), silk_vector_delete(stack), false);
         }
         if (end - 1> left)
         {
             size_t index = left + 1;
-            silk_vector_push_back(stack, &index);
-            silk_vector_push_back(stack, &end);
+            SILK_ASSERT(silk_vector_push_back(stack, &index), silk_free(buffer), silk_vector_delete(stack), false);
+            SILK_ASSERT(silk_vector_push_back(stack, &end), silk_free(buffer), silk_vector_delete(stack), false);
         }
     }
 
     silk_free(buffer);
     silk_vector_delete(stack);
+    return true;
 }

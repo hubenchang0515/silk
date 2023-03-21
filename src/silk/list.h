@@ -80,7 +80,7 @@ silk_list_node_t silk_list_next(silk_list_node_t node);
  * @brief insert an element before a node
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data);
 
@@ -88,7 +88,7 @@ silk_list_node_t silk_list_insert_before(silk_list_node_t node, const void* data
  * @brief insert an element after a node
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_insert_after(silk_list_node_t node, const void* data);
 
@@ -135,7 +135,7 @@ silk_list_node_t silk_list_at_backward(silk_list_t list, size_t index);
  * @brief push an element to the front of a list
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_push_front(silk_list_t list, const void* data);
 
@@ -143,7 +143,7 @@ silk_list_node_t silk_list_push_front(silk_list_t list, const void* data);
  * @brief push an element to the back of a list
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new node, NULL means failed
  *******************************************************/
 silk_list_node_t silk_list_push_back(silk_list_t list, const void* data);
 
@@ -151,7 +151,8 @@ silk_list_node_t silk_list_push_back(silk_list_t list, const void* data);
  * @brief pop an element from the front of a list
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new head node, NULL means empty
+ * @note pop the only one node or failed both return NULL
  *******************************************************/
 silk_list_node_t silk_list_pop_front(silk_list_t list, void* data);
 
@@ -159,7 +160,8 @@ silk_list_node_t silk_list_pop_front(silk_list_t list, void* data);
  * @brief pop an element from the back of a list
  * @param node the node
  * @param data the element data
- * @return the new node
+ * @return the new tail node, NULL means empty
+ * @note pop the only one node or failed both return NULL
  *******************************************************/
 silk_list_node_t silk_list_pop_back(silk_list_t list, void* data);
 
@@ -192,7 +194,8 @@ silk_list_node_t silk_list_find(silk_list_node_t list, const void* data, silk_co
  *        with stack rather than recursion
  * @param list the list
  * @param compare function to compare
+ * @return whether it is successful
  *******************************************************/
-void silk_list_sort(silk_list_t list, silk_compare_t compare);
+bool silk_list_sort(silk_list_t list, silk_compare_t compare);
 
 #endif // SILK_LIST_H
