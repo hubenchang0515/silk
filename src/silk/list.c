@@ -75,13 +75,6 @@ void silk_list_delete(silk_list_t list)
  * @brief clear a list
  * @return the list
  *******************************************************/
-void silk_list_clear(silk_list_t list);
-
-/*******************************************************
- * @brief copy a list
- * @param list the list to be copied
- * @return the copied list 
- *******************************************************/
 void silk_list_clear(silk_list_t list)
 {
     SILK_ASSERT(list != NULL);
