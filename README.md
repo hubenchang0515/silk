@@ -24,7 +24,7 @@ sudo cmake --build . --target install
 ```
 mkdir build
 cd build
-cmake .. -DUNIT_TEST
+cmake .. -DUNIT_TEST=ON
 cmake --build .
 ```
 
