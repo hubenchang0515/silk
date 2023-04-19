@@ -3,6 +3,59 @@
 
 #define N 4096
 
+void test_vector_map_callback(void* element)
+{
+    int* p = (int*)element;
+    *p *= 2;
+}
+
+void test_vector_map()
+{
+    silk_vector_t vector = silk_vector_new(sizeof(int));
+
+    for (int i = 0; i < N; i++)
+    {
+        silk_vector_append(vector, &i);    
+    }
+
+    silk_vector_map(vector, test_vector_map_callback);
+
+    for (int i = 0; i < N; i++)
+    {
+        int n;
+        silk_vector_pop_front(vector, &n);
+        SILK_ASSERT(n == i*2);    
+    }
+
+    silk_vector_delete(vector);
+}
+
+void test_vector_reduce_callback(void* data, void* element)
+{
+    int* p1 = (int*)data;
+    int* p2 = (int*)element;
+
+    *p1 = *p1 + *p2;
+}
+
+void test_vector_reduce()
+{
+    silk_vector_t vector = silk_vector_new(sizeof(int));
+
+    int sum = 0;
+    for (int i = 0; i < N; i++)
+    {
+        silk_vector_append(vector, &i); 
+        sum += i;   
+    }
+
+    int result = 0;
+    silk_vector_reduce(vector, test_vector_reduce_callback, &result);
+    SILK_ASSERT(result == sum);
+    
+    silk_vector_delete(vector);
+}
+
 void test_vector()
 {
     // create
@@ -110,4 +163,7 @@ void test_vector()
 
     // delete
     silk_vector_delete(copied);
+
+    test_vector_map();
+    test_vector_reduce();
 }

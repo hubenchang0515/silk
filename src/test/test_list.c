@@ -4,6 +4,59 @@
 #define TYPE float
 #define N 2048
 
+void test_list_map_callback(void* element)
+{
+    int* p = (int*)element;
+    *p *= 2;
+}
+
+void test_list_map()
+{
+    silk_list_t list = silk_list_new(sizeof(int));
+
+    for (int i = 0; i < N; i++)
+    {
+        silk_list_push_back(list, &i);    
+    }
+
+    silk_list_map(list, test_list_map_callback);
+
+    for (int i = 0; i < N; i++)
+    {
+        int n;
+        silk_list_pop_front(list, &n);
+        SILK_ASSERT(n == i*2);    
+    }
+
+    silk_list_delete(list);
+}
+
+void test_list_reduce_callback(void* data, void* element)
+{
+    int* p1 = (int*)data;
+    int* p2 = (int*)element;
+
+    *p1 = *p1 + *p2;
+}
+
+void test_list_reduce()
+{
+    silk_list_t list = silk_list_new(sizeof(int));
+
+    int sum = 0;
+    for (int i = 0; i < N; i++)
+    {
+        silk_list_push_back(list, &i); 
+        sum += i;   
+    }
+
+    int result = 0;
+    silk_list_reduce(list, test_list_reduce_callback, &result);
+    SILK_ASSERT(result == sum);
+    
+    silk_list_delete(list);
+}
+
 void test_list()
 {
     silk_list_t list = silk_list_new(sizeof(TYPE));
@@ -172,4 +225,7 @@ void test_list()
     }
 
     silk_list_delete(list);
+
+    test_list_map();
+    test_list_reduce();
 }

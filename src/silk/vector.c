@@ -122,6 +122,46 @@ silk_vector_t silk_vector_copy(silk_vector_t vector)
 }
 
 /*******************************************************
+ * @brief invoke callback for every elements
+ *        see https://en.wikipedia.org/wiki/MapReduce
+ * @param vector the vector
+ * @param callback the callback function
+ * @return whether it is successful
+ *******************************************************/
+bool silk_vector_map(silk_vector_t vector, silk_map_callback_t callback)
+{
+    SILK_ASSERT(vector != NULL, false);
+
+    for (size_t i = 0; i < vector->length; i++)
+    {
+        callback(SILK_VECTOR_ELEMENT(vector, i));
+    }
+
+    return true;
+}
+
+/*******************************************************
+ * @brief invoke callback for every elements like
+ *        data = callback(data, element)
+ *        see https://en.wikipedia.org/wiki/MapReduce
+ * @param vector the vector
+ * @param callback the callback function
+ * @param data the data input init value and output result
+ * @return the result value
+ *******************************************************/
+bool silk_vector_reduce(silk_vector_t vector, silk_reduce_callback_t callback, void* data)
+{
+    SILK_ASSERT(vector != NULL, false);
+
+    for (size_t i = 0; i < vector->length; i++)
+    {
+        callback(data, SILK_VECTOR_ELEMENT(vector, i));
+    }
+
+    return true;
+}
+
+/*******************************************************
  * @brief get the raw data pointer of a vector
  * @param vector the vector
  * @return the data pointer

@@ -35,6 +35,26 @@ void silk_list_clear(silk_list_t list);
 silk_list_t silk_list_copy(silk_list_t list);
 
 /*******************************************************
+ * @brief invoke callback for every elements
+ *        see https://en.wikipedia.org/wiki/MapReduce
+ * @param list the list
+ * @param callback the callback function
+ * @return whether it is successful
+ *******************************************************/
+bool silk_list_map(silk_list_t list, silk_map_callback_t callback);
+
+/*******************************************************
+ * @brief invoke callback for every elements like
+ *        result = callback(result, element)
+ *        see https://en.wikipedia.org/wiki/MapReduce
+ * @param list the list
+ * @param callback the callback function
+ * @param data the data input init value and output result
+ * @return the result value
+ *******************************************************/
+bool silk_list_reduce(silk_list_t list, silk_reduce_callback_t callback, void* data);
+
+/*******************************************************
  * @brief get the element size of a list
  * @param list the list
  * @return the element size
