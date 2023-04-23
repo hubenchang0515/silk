@@ -46,14 +46,22 @@ static bool silk_vector_expand(silk_vector_t vector)
     return true;
 }
 
-static bool silk_vector_enough(silk_vector_t vector)
+/*******************************************************
+ * @brief check if capacity is enough, auto alloc
+ * @param vector the vector
+ * @param count count of new elements
+ * @return whether is is enough
+ *******************************************************/
+static bool silk_vector_enough(silk_vector_t vector, size_t count)
 {
     SILK_ASSERT(vector != NULL, false);
 
-    if (vector->capacity > vector->length)
-        return true;
+    while (vector->capacity <= vector->length + count)
+    {
+        SILK_ASSERT(silk_vector_expand(vector), false);
+    }
 
-    return silk_vector_expand(vector);
+    return true;
 }
 
 /*******************************************************
@@ -252,19 +260,23 @@ bool silk_vector_reserve(silk_vector_t vector, size_t capacity)
 }
 
 /*******************************************************
- * @brief append an element into a vector
+ * @brief insert elements into a vector
  * @param vector the vector
- * @param data the element
+ * @param index the index
+ * @param data the first element address
+ * @param count the count of elements
  * @return whether it is successful
  *******************************************************/
-bool silk_vector_append(silk_vector_t vector, const void* data)
+bool silk_vector_inserts(silk_vector_t vector, size_t index, const void* data, size_t count)
 {
     SILK_ASSERT(vector != NULL, false);
     SILK_ASSERT(data != NULL, false);
-    SILK_ASSERT(silk_vector_enough(vector), false);
+    SILK_ASSERT(index <= vector->length, false);
+    SILK_ASSERT(silk_vector_enough(vector, count), false);
 
-    silk_copy(SILK_VECTOR_ELEMENT(vector, vector->length), data, vector->element_size);
-    vector->length += 1;
+    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index+count), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
+    silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size * count);
+    vector->length += count;
     return true;
 }
 
@@ -277,14 +289,36 @@ bool silk_vector_append(silk_vector_t vector, const void* data)
  *******************************************************/
 bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
 {
-    SILK_ASSERT(vector != NULL, false);
-    SILK_ASSERT(data != NULL, false);
-    SILK_ASSERT(index <= vector->length, false);
-    SILK_ASSERT(silk_vector_enough(vector), false);
+    return silk_vector_inserts(vector, index, data, 1);
+}
 
-    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_SIZE_FROM(vector, index));
-    silk_copy(SILK_VECTOR_ELEMENT(vector, index), data, vector->element_size);
-    vector->length += 1;
+/*******************************************************
+ * @brief append an element into a vector
+ * @param vector the vector
+ * @param data the element
+ * @return whether it is successful
+ *******************************************************/
+bool silk_vector_append(silk_vector_t vector, const void* data)
+{
+    return silk_vector_insert(vector, vector->length, data);
+}
+
+/*******************************************************
+ * @brief remove elements from a vector
+ * @param vector the vector
+ * @param index the index
+ * @param count the count of elements
+ * @return whether it is successful
+ *******************************************************/
+bool silk_vector_removes(silk_vector_t vector, size_t index, size_t count)
+{
+    SILK_ASSERT(vector != NULL, false);
+    SILK_ASSERT(index + count - 1 < vector->length, false);
+
+    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index), 
+                        SILK_VECTOR_ELEMENT(vector, index+count), 
+                        SILK_VECTOR_SIZE_FROM(vector, index+count));
+    vector->length -= count;
     return true;
 }
 
@@ -296,12 +330,7 @@ bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data)
  *******************************************************/
 bool silk_vector_remove(silk_vector_t vector, size_t index)
 {
-    SILK_ASSERT(vector != NULL, false);
-    SILK_ASSERT(index < vector->length, false);
-
-    silk_overlap_copy(SILK_VECTOR_ELEMENT(vector, index), SILK_VECTOR_ELEMENT(vector, index+1), SILK_VECTOR_SIZE_FROM(vector, index+1));
-    vector->length -= 1;
-    return true;
+    return silk_vector_removes(vector, index, 1);
 }
 
 /*******************************************************

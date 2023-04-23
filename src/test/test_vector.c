@@ -56,6 +56,31 @@ void test_vector_reduce()
     silk_vector_delete(vector);
 }
 
+void test_vector_inserts()
+{
+    int data[10] = {0,1,2,3,4,5,6,7,8,9};
+    silk_vector_t vector = silk_vector_new(sizeof(int));
+    SILK_ASSERT(silk_vector_inserts(vector, 0, data, 10));
+
+    for (int i = 0; i < 10; i++)
+    {
+        int n;
+        silk_vector_get(vector, i, &n);
+        SILK_ASSERT(n == i);
+    }
+
+    SILK_ASSERT(silk_vector_removes(vector, 5, 5));
+    SILK_ASSERT(silk_vector_length(vector) == 5);
+    for (int i = 0; i < 5; i++)
+    {
+        int n;
+        silk_vector_get(vector, i, &n);
+        SILK_ASSERT(n == i);
+    }
+    
+    silk_vector_delete(vector);
+}
+
 void test_vector()
 {
     // create
@@ -166,4 +191,5 @@ void test_vector()
 
     test_vector_map();
     test_vector_reduce();
+    test_vector_inserts();
 }

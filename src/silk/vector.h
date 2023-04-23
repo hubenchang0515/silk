@@ -103,12 +103,14 @@ bool silk_vector_recycle(silk_vector_t vector);
 bool silk_vector_reserve(silk_vector_t vector, size_t capacity);
 
 /*******************************************************
- * @brief append an element into a vector
+ * @brief insert elements into a vector
  * @param vector the vector
- * @param data the element
+ * @param index the index
+ * @param data the first element address
+ * @param count the count of elements
  * @return whether it is successful
  *******************************************************/
-bool silk_vector_append(silk_vector_t vector, const void* data);
+bool silk_vector_inserts(silk_vector_t vector, size_t index, const void* data, size_t count);
 
 /*******************************************************
  * @brief insert an element into a vector
@@ -118,6 +120,23 @@ bool silk_vector_append(silk_vector_t vector, const void* data);
  * @return whether it is successful
  *******************************************************/
 bool silk_vector_insert(silk_vector_t vector, size_t index, const void* data);
+
+/*******************************************************
+ * @brief append an element into a vector
+ * @param vector the vector
+ * @param data the element
+ * @return whether it is successful
+ *******************************************************/
+bool silk_vector_append(silk_vector_t vector, const void* data);
+
+/*******************************************************
+ * @brief remove elements from a vector
+ * @param vector the vector
+ * @param index the index
+ * @param count the count of elements
+ * @return whether it is successful
+ *******************************************************/
+bool silk_vector_removes(silk_vector_t vector, size_t index, size_t count);
 
 /*******************************************************
  * @brief remove an element from a vector
