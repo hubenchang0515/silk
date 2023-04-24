@@ -3,6 +3,7 @@ void test_compare();
 void test_memory();
 void test_vector();
 void test_list();
+void test_string();
 
 int main()
 {
@@ -11,5 +12,6 @@ int main()
     test_memory();
     test_vector();
     test_list();
+    test_string();
     return 0;
 }
