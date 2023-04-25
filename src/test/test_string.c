@@ -117,7 +117,6 @@ void test_string_append()
     
     for (size_t i = 0; i < strlen(cstr); i++)
         SILK_ASSERT(silk_string_append(str, cstr[i]));
-    printf("%s\n", silk_string_get(str));
     SILK_ASSERT(strcmp(silk_string_get(str), "hello world") == 0);
     silk_string_delete(str);
 }
