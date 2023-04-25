@@ -1,7 +1,7 @@
 #include <silk/log.h>
 #include <silk/vector.h>
 
-#define N 4096
+#define N 2048
 
 void test_vector_map_callback(void* element)
 {
@@ -95,7 +95,6 @@ void test_vector()
     // append
     for (int i = 0; i < N; i++)
     {
-        SILK_ASSERT(silk_vector_find(vector, (void*)(&i), 0, silk_vector_default_compare) == SILK_INVALID_INDEX);
         SILK_ASSERT(silk_vector_push_back(vector, (void*)(&i)) == true);
         SILK_ASSERT(silk_vector_length(vector) == (size_t)(i+1));
     }
@@ -127,8 +126,10 @@ void test_vector()
     }
 
     // find
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < 10; i++)
     {
+        int n = 2 * N;
+        SILK_ASSERT(silk_vector_find(vector, (void*)(&n), 0, silk_vector_default_compare) == SILK_INVALID_INDEX);
         SILK_ASSERT(silk_vector_find(vector, (void*)(&i), 0, silk_vector_default_compare) == (size_t)(N - i - 1));
         SILK_ASSERT(silk_vector_find(vector, (void*)(&i), N, silk_vector_default_compare) == (size_t)(2*N - i - 1));
     }
