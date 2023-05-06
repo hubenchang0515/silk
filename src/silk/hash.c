@@ -6,7 +6,7 @@
  *        see: https://en.wikipedia.org/wiki/MurmurHash
  * @param data the data
  * @param len length of the data
- * @param seed hash seed
+ * @param seed seed of hash
  * @return the hash value
  *******************************************************/
 uint32_t silk_hash_murmur3_32(const void* data, size_t len, uint32_t seed)
@@ -37,13 +37,16 @@ uint32_t silk_hash_murmur3_32(const void* data, size_t len, uint32_t seed)
 
     const uint8_t* remaining = (const uint8_t*)(data) + (i * sizeof(uint32_t));
     uint32_t remainingBytes = 0;
-    switch (len&3)
-    {
-    case 3:
+    size_t remainingSize = len - i * sizeof(uint32_t);
+
+    if (remainingSize >= 3)
         remainingBytes |= (remaining[2] << 16);
-    case 2:
+
+    if (remainingSize >= 2)
         remainingBytes |= (remaining[1] << 8);
-    case 1:
+
+    if (remainingSize >= 1)
+    {
         remainingBytes |= remaining[0];
 
         remainingBytes = remainingBytes * c1;
