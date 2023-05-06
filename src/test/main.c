@@ -5,6 +5,7 @@ void test_vector();
 void test_list();
 void test_string();
 void test_endian();
+void test_hash();
 
 int main()
 {
@@ -15,5 +16,6 @@ int main()
     test_list();
     test_string();
     test_endian();
+    test_hash();
     return 0;
 }
