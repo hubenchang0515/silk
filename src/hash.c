@@ -1,5 +1,5 @@
-#include "hash.h"
-#include "log.h"
+#include <silk/hash.h>
+#include <silk/log.h>
 
 /*******************************************************
  * @brief calculate the hash value by MurmurHash

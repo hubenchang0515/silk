@@ -1,4 +1,4 @@
-#include "log.h"
+#include <silk/log.h>
 
 #include <stdio.h>
 #include <stdlib.h>

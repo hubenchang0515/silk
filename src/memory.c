@@ -1,4 +1,5 @@
-#include "memory.h"
+#include <silk/memory.h>
+
 #include <stdlib.h>
 #include <string.h>
 

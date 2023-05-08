@@ -1,6 +1,6 @@
-#include "string.h"
-#include "log.h"
-#include "vector.h"
+#include <silk/string.h>
+#include <silk/log.h>
+#include <silk/vector.h>
 
 #include <string.h>
 

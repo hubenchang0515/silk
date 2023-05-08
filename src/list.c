@@ -1,5 +1,5 @@
-#include "list.h"
-#include "log.h"
+#include <silk/list.h>
+#include <silk/log.h>
 
 #include <string.h>
 

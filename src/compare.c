@@ -1,9 +1,9 @@
-#include "compare.h"
+#include <silk/compare.h>
+#include <silk/log.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "log.h"
 
 #define SILK_COMPARE_DEFINE(TYPE, NAME)         \
 SILK_COMPARE_DECLARE(TYPE, NAME)                \

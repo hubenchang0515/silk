@@ -1,4 +1,4 @@
-#include "endian.h"
+#include <silk/endian.h>
 
 #define SILK_ENDIAN_LEFT_SHIFT_READ(TYPE, PTR, INDEX, SHIFT)    (((TYPE)(*(PTR + INDEX))) << SHIFT) 
 #define SILK_ENDIAN_RIGHT_SHIFT_WRITE(VALUE, PTR, INDEX, SHIFT) (*(PTR + INDEX) = (uint8_t)((value >> SHIFT) & 0xff))

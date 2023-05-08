@@ -1,5 +1,5 @@
-#include "vector.h"
-#include "log.h"
+#include <silk/vector.h>
+#include <silk/log.h>
 
 #include <string.h>
 
